@@ -2,6 +2,7 @@
 name = "xentrace-parser-rs"
 version = "0.1.0"
 authors = ["Giuseppe Eletto <peppe.eletto@gmail.com>"]
+description = "A XenTrace files parser with a study purpose"
 readme = "README.md"
 license = "LGPL-2.1-or-later"
 license-file = "LICENSE"
