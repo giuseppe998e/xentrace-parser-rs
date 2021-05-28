@@ -21,7 +21,7 @@ impl Event {
         }
     }
 
-    pub(crate) set_extra(&self, extra: [u32; 7]) {
+    pub(crate) fn set_extra(&self, extra: [u32; 7]) {
         self.n_extra = extra.len() as u8;
         self.extra = extra;
     }
