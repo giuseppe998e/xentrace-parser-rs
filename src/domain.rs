@@ -2,16 +2,18 @@
 pub struct Domain(u32);
 
 impl Domain {
-    pub fn new(id: u16, vcpu: u16) -> Self {
+    // CRATE FNs
+    pub(crate) fn new(id: u16, vcpu: u16) -> Self {
         let shift_vcpu = (vcpu as u32) << 16;
         let value = shift_vcpu | (id as u32);
         Self(value)
     }
 
-    pub fn from_u32(value: u32) -> Self {
+    pub(crate) fn from_u32(value: u32) -> Self {
         Self(value)
     }
 
+    // PUBLIC FNs
     pub fn as_u32(&self) -> u32 {
         self.0
     }
