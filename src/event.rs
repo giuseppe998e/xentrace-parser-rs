@@ -1,4 +1,4 @@
-#[derive(Clone, Debug)]
+#[derive(Clone, Eq, PartialOrd, Ord, Debug)]
 pub struct Event {
     code: u32,
     in_tsc: bool,
@@ -7,10 +7,10 @@ pub struct Event {
 }
 
 impl Event {
-    pub fn new(code: u32, in_tsc: bool, tsc: u64) -> Self {
+    pub fn new(code: u32, tsc: u64) -> Self {
         Self {
             code,
-            in_tsc,
+            in_tsc: tsc > 0,
             tsc,
             extra: [0; 7],
         }
@@ -30,5 +30,17 @@ impl Event {
             true => Some(self.tsc),
             false => None,
         }
+    }
+}
+
+impl PartialEq for Event {
+    fn eq(&self, other: &Self) -> bool {
+        self.code == other.code
+            && self.tsc == other.tsc
+            && self
+                .extra
+                .iter()
+                .zip(other.extra.iter())
+                .all(|(a, b)| a == b)
     }
 }
