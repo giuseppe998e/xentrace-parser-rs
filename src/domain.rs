@@ -1,6 +1,4 @@
-use std::cmp::Ordering;
-
-#[derive(Clone, Eq, Debug)]
+#[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Debug)]
 pub struct Domain(u32);
 
 impl Domain {
@@ -27,6 +25,7 @@ impl Domain {
     }
 }
 
+/*
 impl PartialEq for Domain {
     fn eq(&self, other: &Self) -> bool {
         self.0 == other.0
@@ -46,3 +45,4 @@ impl Ord for Domain {
         self.0.cmp(&other.0)
     }
 }
+*/
