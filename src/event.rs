@@ -3,10 +3,8 @@ use std::cmp::Ordering;
 #[derive(Clone, Eq, Debug)]
 pub struct Event {
     code: u32,
-    in_tsc: bool,
-    tsc: u64,
-    n_extra: u8, // 0..7
-    extra: [u32; 7],
+    tsc: Option<u64>,
+    extra: [Option<u32>; 7],
 }
 
 impl Event {
@@ -14,21 +12,17 @@ impl Event {
     pub(crate) fn new(code: u32) -> Self {
         Self {
             code,
-            n_extra: extra.len() as u8,
-            in_tsc: tsc > 0,
-            tsc,
-            extra,
+            tsc: None,
+            extra: [None; 7],
         }
     }
 
-    pub(crate) fn set_extra(&self, extra: [u32; 7]) {
-        self.n_extra = extra.len() as u8;
+    pub(crate) fn set_extra(&self, extra: [Option<u32>; 7]) {
         self.extra = extra;
     }
 
     pub(crate) fn set_tsc(&self, value: u64) {
-        self.in_tsc = true;
-        self.tsc = value;
+        self.tsc = Some(value);
     }
 
     // PUBLIC FNs
@@ -37,19 +31,15 @@ impl Event {
     }
 
     pub fn get_extra_size(&self) -> u8 {
-        self.n_extra
+        self.extra.iter().filter(|x| x.is_some()).count() as u8
     }
 
-    pub fn get_extra(&self) -> [u32; 7] {
+    pub fn get_extra(&self) -> [Option<u32>; 7] {
         self.extra.clone()
     }
 
     pub fn get_tsc(&self) -> Option<u64> {
-        /*return*/
-        match self.in_tsc {
-            true => Some(self.tsc),
-            false => None,
-        }
+        self.tsc
     }
 }
 
