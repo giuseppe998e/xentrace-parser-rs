@@ -63,6 +63,12 @@ impl Domain {
     }
 }
 
+impl Default for Domain {
+    fn default() -> Self {
+        Domain::new(DomainType::Default, 0)
+    }
+}
+
 /*
 impl PartialEq for Domain {
     fn eq(&self, other: &Self) -> bool {
