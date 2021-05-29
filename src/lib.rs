@@ -9,7 +9,7 @@ const TRC_TRACE_CPU_CHANGE: u32 = 0x0001f003;
 const TRC_SCHED_MIN: u32 = 0x00021000;
 
 #[derive(Debug)]
-pub struct XTParser {
+pub struct Parser {
     // Host CPUs fiels
     cpu_current: u8,
     cpu_domains: HashMap<u8, Domain>,
@@ -18,7 +18,7 @@ pub struct XTParser {
     records: Vec<Record>,
 }
 
-impl XTParser {
+impl Parser {
     // PUBLIC FNs
     pub fn new(path: &str) -> Result<Self> {
         let mut instance = Self {
