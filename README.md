@@ -8,7 +8,7 @@ This is the Rust lang version of a [project](https://github.com/giuseppe998e/xen
 use xentrace_parser::{Parser, /*Record,*/ Event, Domain, DomainType};
 
 fn main() -> std::io::Result<()> {
-    let parser = Parser::new("/home/giuseppe/Downloads/trace_xen.bin")?;
+    let parser = Parser::new("/absolute/path/trace_xen.bin")?;
     let records = parser.get_records(); // Vec<Record>
 
     for r in records {
