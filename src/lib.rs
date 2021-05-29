@@ -10,8 +10,7 @@ pub struct XTParser {
     // Host CPUs fiels
     cpu_current: u8,
     cpu_highter: u8,
-    // Virt. domain fields (CPU, Domain)
-    dom_hmap: HashMap<u8, Domain>,
+    cpu_domains: HashMap<u8, Domain>,
     // Events fiels
     tsc_last: u64,
     events: Vec<Record>,
@@ -23,8 +22,7 @@ impl XTParser {
             // Host CPUs fiels
             cpu_current: 0,
             cpu_highter: 0,
-            // Virt. domain fields (CPU, Domain)
-            dom_hmap: HashMap::new(),
+            cpu_domains: HashMap::new(),
             // Events fiels
             tsc_last: 0,
             events: Vec::new(),
@@ -49,6 +47,12 @@ impl XTParser {
 
     fn upd_host_cpu(&mut self, cpu: u8) {
         self.cpu_current = cpu;
+
+        let contains_key = self.cpu_domains.contains_key(&cpu);
+        if contains_key {
+            self.cpu_domains
+                .insert(cpu, Domain::new(DomainType::Default, 0));
+        }
 
         if self.cpu_highter < cpu {
             self.cpu_highter = cpu;

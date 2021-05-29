@@ -58,7 +58,7 @@ mod tests {
     #[test]
     fn record() {
         let domain = Domain::from_u32(0x00018000);
-        let  event = Event::new(0x0001f003);
+        let event = Event::new(0x0001f003);
         let record = Record::new(5, domain, event);
 
         assert_eq!(record.get_cpu(), 5);
