@@ -1,6 +1,6 @@
 use std::cmp::Ordering;
 
-#[derive(Clone, Eq, Debug)]
+#[derive(Clone, Copy, Eq, Debug)]
 pub struct Event {
     code: u32,
     tsc: Option<u64>,
@@ -17,11 +17,13 @@ impl Event {
         }
     }
 
-    pub(crate) fn set_extra(&self, extra: [Option<u32>; 7]) {
-        self.extra = extra;
+    pub(crate) fn set_extra(&mut self, extra: &[Option<u32>]) {
+        for x in 0..extra.len() {
+            self.extra[x] = extra[x];
+        }
     }
 
-    pub(crate) fn set_tsc(&self, value: u64) {
+    pub(crate) fn set_tsc(&mut self, value: u64) {
         self.tsc = Some(value);
     }
 
@@ -35,7 +37,7 @@ impl Event {
     }
 
     pub fn get_extra(&self) -> [Option<u32>; 7] {
-        self.extra.clone()
+        self.extra
     }
 
     pub fn get_tsc(&self) -> Option<u64> {
@@ -64,5 +66,37 @@ impl Ord for Event {
 impl PartialOrd for Event {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const EVENT_CODE: u32 = 0x0001f003;
+
+    #[test]
+    fn event_new() {
+        let event = Event::new(EVENT_CODE);
+        assert_eq!(event, Event::new(EVENT_CODE));
+    }
+
+    #[test]
+    fn event_tsc() {
+        let mut event = Event::new(EVENT_CODE);
+
+        assert_eq!(event.get_tsc(), None);
+
+        event.set_tsc(1382371621213);
+        assert_eq!(event.get_tsc(), Some(1382371621213));
+    }
+
+    #[test]
+    fn event_extra() {
+        let mut event = Event::new(EVENT_CODE);
+
+        event.set_extra(&[Some(1), None, Some(3), None, Some(5)]);
+        assert_eq!(event.get_extra_size(), 3);
+        assert_eq!(event.get_extra()[4], Some(5));
     }
 }
