@@ -30,12 +30,8 @@ impl Event {
         self.code
     }
 
-    pub fn get_extra_size(&self) -> u8 {
-        self.extra.len() as u8
-    }
-
-    pub fn get_extra(&self) -> &[u32] {
-        self.extra.as_slice()
+    pub fn get_extra(&self) -> &Vec<u32> {
+        &self.extra
     }
 
     pub fn get_tsc(&self) -> Option<u64> {
@@ -94,7 +90,7 @@ mod tests {
         let mut event = Event::new(EVENT_CODE);
 
         event.set_extra(&[1, 3, 5]);
-        assert_eq!(event.get_extra_size(), 3);
+        assert_eq!(event.get_extra().len(), 3);
         assert_eq!(event.get_extra()[2], 5);
     }
 }
