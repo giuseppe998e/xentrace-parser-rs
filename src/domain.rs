@@ -7,7 +7,7 @@ pub enum DomainType {
 }
 
 impl DomainType {
-    pub(crate) fn from_u16(val: u16) -> Self {
+    pub(crate) fn from_id(val: u16) -> Self {
         match val {
             0 => Self::Zero,
             32767 => Self::Idle,
@@ -16,12 +16,12 @@ impl DomainType {
         }
     }
 
-    pub fn as_u16(&self) -> u16 {
+    pub fn to_id(&self) -> u16 {
         match self {
             Self::Zero => 0,
             Self::Idle => 32767,
             Self::Default => 32768,
-            Self::Guest(x) => *x,
+            Self::Guest(v) => *v,
         }
     }
 }
@@ -36,7 +36,7 @@ impl Domain {
     // CRATE FNs
     pub(crate) fn new(id: u16, vcpu: u16) -> Self {
         Self {
-            tipe: DomainType::from_u16(id),
+            tipe: DomainType::from_id(id),
             vcpu,
         }
     }
@@ -49,7 +49,7 @@ impl Domain {
 
     // PUBLIC FNs
     pub fn as_u32(&self) -> u32 {
-        let id = self.tipe.as_u16();
+        let id = self.tipe.to_id();
         ((self.vcpu << 16) | id).into()
     }
 
