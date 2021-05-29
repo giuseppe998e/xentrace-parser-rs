@@ -6,7 +6,7 @@ pub use event::Event;
 
 use std::cmp::Ordering;
 
-#[derive(Clone, Copy, Eq, Debug)]
+#[derive(Clone, Eq, Debug)]
 pub struct Record {
     cpu: u8,
     domain: Domain,
@@ -29,7 +29,7 @@ impl Record {
     }
 
     pub fn get_event(&self) -> Event {
-        self.event
+        self.event.clone()
     }
 }
 

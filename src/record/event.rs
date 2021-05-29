@@ -1,10 +1,10 @@
 use std::cmp::Ordering;
 
-#[derive(Clone, Copy, Eq, Debug)]
+#[derive(Clone, Eq, Debug)]
 pub struct Event {
     code: u32,
     tsc: Option<u64>,
-    extra: [Option<u32>; 7],
+    extra: Vec<u32>,
 }
 
 impl Event {
@@ -13,14 +13,12 @@ impl Event {
         Self {
             code,
             tsc: None,
-            extra: [None; 7],
+            extra: Vec::new(),
         }
     }
 
     pub(crate) fn set_extra(&mut self, extra: &[u32]) {
-        for x in 0..extra.len() {
-            self.extra[x] = Some(extra[x]);
-        }
+        self.extra.extend_from_slice(extra);
     }
 
     pub(crate) fn set_tsc(&mut self, value: u64) {
@@ -33,11 +31,11 @@ impl Event {
     }
 
     pub fn get_extra_size(&self) -> u8 {
-        self.extra.iter().filter(|x| x.is_some()).count() as u8
+        self.extra.len() as u8
     }
 
-    pub fn get_extra(&self) -> [Option<u32>; 7] {
-        self.extra
+    pub fn get_extra(&self) -> &[u32] {
+        self.extra.as_slice()
     }
 
     pub fn get_tsc(&self) -> Option<u64> {
