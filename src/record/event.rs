@@ -17,9 +17,9 @@ impl Event {
         }
     }
 
-    pub(crate) fn set_extra(&mut self, extra: &[Option<u32>]) {
+    pub(crate) fn set_extra(&mut self, extra: &[u32]) {
         for x in 0..extra.len() {
-            self.extra[x] = extra[x];
+            self.extra[x] = Some(extra[x]);
         }
     }
 
@@ -95,8 +95,8 @@ mod tests {
     fn event_extra() {
         let mut event = Event::new(EVENT_CODE);
 
-        event.set_extra(&[Some(1), None, Some(3), None, Some(5)]);
+        event.set_extra(&[1, 3, 5]);
         assert_eq!(event.get_extra_size(), 3);
-        assert_eq!(event.get_extra()[4], Some(5));
+        assert_eq!(event.get_extra()[2], Some(5));
     }
 }
