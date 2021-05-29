@@ -21,7 +21,7 @@ impl DomainType {
             Self::Zero => 0,
             Self::Idle => 32767,
             Self::Default => 32768,
-            Self::Guest(v) => *v,
+            Self::Guest(val) => *val,
         }
     }
 }
