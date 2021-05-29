@@ -38,10 +38,6 @@ impl XTParser {
         &self.records
     }
 
-    pub fn get_records_count(&self) -> usize {
-        self.records.len()
-    }
-
     pub fn get_cpu_count(&self) -> u8 {
         let cpu_max = self.cpu_domains.keys().max().unwrap();
         cpu_max + 1
