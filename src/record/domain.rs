@@ -97,7 +97,7 @@ mod tests {
 
     #[test]
     fn dom_from_u32() {
-        let dom1 = Domain::new(DomainType::Guest(2), 1);
+        let dom1 = Domain::new(DomainType::Guest(1), 2);
         let dom2 = Domain::from_u32(0x00010002);
 
         assert_eq!(dom1, dom2);
@@ -107,7 +107,7 @@ mod tests {
     fn dom_getters() {
         let dom = Domain::new(DomainType::Default, 1);
 
-        assert_eq!(dom.as_u32(), 0x00018000);
+        assert_eq!(dom.as_u32(), 0x80000001);
         assert_eq!(dom.get_type(), DomainType::Default);
         assert_eq!(dom.get_vcpu(), 1);
     }

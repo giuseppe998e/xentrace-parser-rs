@@ -95,6 +95,6 @@ mod tests {
 
         event.set_extra(&[1, 3, 5]);
         assert_eq!(event.get_extra_size(), 3);
-        assert_eq!(event.get_extra()[2], Some(5));
+        assert_eq!(event.get_extra()[2], 5);
     }
 }

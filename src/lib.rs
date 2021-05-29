@@ -140,22 +140,3 @@ impl XTParser {
         Ok(record)
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn parser_print() {
-        let code = XTParser::new("/home/giuseppe/Downloads/trace_xen.bin").unwrap();
-        let records = code.get_records();
-
-        for rec in records {
-            println!("{:?}", rec);
-        }
-
-        println!(); // BLANK
-        println!("Records count: {:?}", code.get_records_count());
-        println!("CPU count: {:?}", code.get_cpu_count());
-    }
-}

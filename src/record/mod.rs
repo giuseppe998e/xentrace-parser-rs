@@ -63,6 +63,6 @@ mod tests {
 
         assert_eq!(record.get_cpu(), 5);
         assert_eq!(record.get_domain(), domain);
-        assert_eq!(record.get_event(), event);
+        assert_eq!(record.get_event(), Event::new(0x0001f003));
     }
 }
