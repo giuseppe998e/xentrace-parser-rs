@@ -1,29 +1,64 @@
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Debug)]
-pub struct Domain(u32);
+pub enum DomainType {
+    Zero,
+    Idle,
+    Default,
+    Guest(u16),
+}
+
+impl DomainType {
+    pub(crate) fn from_u16(val: u16) -> Self {
+        match val {
+            0 => Self::Zero,
+            32767 => Self::Idle,
+            32768 => Self::Default,
+            _ => Self::Guest(val),
+        }
+    }
+
+    pub fn as_u16(&self) -> u16 {
+        match self {
+            Self::Zero => 0,
+            Self::Idle => 32767,
+            Self::Default => 32768,
+            Self::Guest(x) => *x,
+        }
+    }
+}
+
+#[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Debug)]
+pub struct Domain {
+    tipe: DomainType, // "type" reserved
+    vcpu: u16,
+}
 
 impl Domain {
     // CRATE FNs
     pub(crate) fn new(id: u16, vcpu: u16) -> Self {
-        let shift_vcpu = (vcpu as u32) << 16;
-        let value = shift_vcpu | (id as u32);
-        Self(value)
+        Self {
+            tipe: DomainType::from_u16(id),
+            vcpu,
+        }
     }
 
     pub(crate) fn from_u32(value: u32) -> Self {
-        Self(value)
+        let id = (value & 0x0000ffff) as u16;
+        let vcpu = (value >> 16) as u16;
+        Self::new(id, vcpu)
     }
 
     // PUBLIC FNs
     pub fn as_u32(&self) -> u32 {
-        self.0
+        let id = self.tipe.as_u16();
+        ((self.vcpu << 16) | id).into()
     }
 
-    pub fn get_id(&self) -> u16 {
-        (self.0 & 0x0000ffff) as u16
+    pub fn get_type(&self) -> DomainType {
+        self.tipe
     }
 
     pub fn get_vcpu(&self) -> u16 {
-        (self.0 >> 16) as u16
+        self.vcpu
     }
 }
 
