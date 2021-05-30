@@ -103,17 +103,6 @@ impl Parser {
         let tsc = Self::read_tsc(hdr, file)?;
         let extra = Self::read_extra(hdr, file)?;
 
-        // Create event
-        let mut event = Event::new(code);
-        event.set_extra(extra.as_slice());
-        match tsc {
-            None => event.set_tsc(self.tsc_last),
-            Some(v) => {
-                self.tsc_last = v;
-                event.set_tsc(v);
-            }
-        }
-
         // Handle special events
         if code == TRC_TRACE_CPU_CHANGE {
             let cpu = *extra.get(0).unwrap() as u8;
@@ -125,6 +114,17 @@ impl Parser {
                 let dom_u32 = *extra.get(0).unwrap();
                 let dom = Domain::from_u32(dom_u32);
                 self.cpu_domains.insert(self.cpu_current, dom);
+            }
+        }
+
+        // Create event
+        let mut event = Event::new(code);
+        event.set_extra(extra.as_slice());
+        match tsc {
+            None => event.set_tsc(self.tsc_last),
+            Some(v) => {
+                self.tsc_last = v;
+                event.set_tsc(v);
             }
         }
 
