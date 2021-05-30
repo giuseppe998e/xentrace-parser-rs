@@ -3,6 +3,7 @@ pub use record::*;
 
 use std::collections::HashMap;
 use std::fs::File;
+use std::path::Path;
 use std::io::{Error, ErrorKind, Read, Result};
 
 const TRC_TRACE_CPU_CHANGE: u32 = 0x0001f003;
@@ -46,7 +47,8 @@ impl Parser {
     // PRIVATE FNs
     fn read_file(&mut self, path: &str) -> Result<()> {
         {
-            let mut file = File::open(path)?;
+            let path_i = Path::new(path);
+            let mut file = File::open(path_i)?;
 
             loop {
                 let record = self.read_record(&mut file);
