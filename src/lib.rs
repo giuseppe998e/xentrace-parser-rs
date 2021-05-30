@@ -3,10 +3,10 @@ pub use record::*;
 
 use std::collections::HashMap;
 use std::fs::File;
-use std::io::{Read, Result};
+use std::io::{Error, ErrorKind, Read, Result};
 
 const TRC_TRACE_CPU_CHANGE: u32 = 0x0001f003;
-const TRC_SCHED_MIN: u32 = 0x00021000;
+const TRC_SCHED_TO_RUN: u32 = 0x00021f0f;
 
 #[derive(Debug)]
 pub struct Parser {
@@ -52,7 +52,10 @@ impl Parser {
                 let record = self.read_record(&mut file);
                 match record {
                     Ok(r) => self.records.push(r),
-                    Err(_) => break,
+                    Err(e) => match e.kind() {
+                        ErrorKind::Other => continue,
+                        _ => break,
+                    },
                 }
             }
         } // File closed
@@ -100,6 +103,20 @@ impl Parser {
         let tsc = Self::read_tsc(hdr, file)?;
         let extra = Self::read_extra(hdr, file)?;
 
+        // Handle special events
+        if code == TRC_TRACE_CPU_CHANGE {
+            let cpu = *extra.get(0).unwrap() as u8;
+            self.cpu_current = cpu;
+            return Err(Error::from(ErrorKind::Other)); // Do not save
+        } else {
+            let is_sched_min = code == (code & TRC_SCHED_TO_RUN);
+            if is_sched_min {
+                let dom_u32 = *extra.get(0).unwrap();
+                let dom = Domain::from_u32(dom_u32);
+                self.cpu_domains.insert(self.cpu_current, dom);
+            }
+        }
+
         // Create event
         let mut event = Event::new(code);
         event.set_extra(extra.as_slice());
@@ -108,19 +125,6 @@ impl Parser {
             Some(v) => {
                 self.tsc_last = v;
                 event.set_tsc(v);
-            }
-        }
-
-        // Handle special events
-        if code == TRC_TRACE_CPU_CHANGE {
-            let cpu = *extra.get(0).unwrap() as u8;
-            self.cpu_current = cpu;
-        } else {
-            let is_sched_min = code == (code & (TRC_SCHED_MIN | 0xf0f));
-            if is_sched_min {
-                let dom_u32 = *extra.get(0).unwrap();
-                let dom = Domain::from_u32(dom_u32);
-                self.cpu_domains.insert(self.cpu_current, dom);
             }
         }
 
