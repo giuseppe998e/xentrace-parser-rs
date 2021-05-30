@@ -6,7 +6,7 @@ use std::fs::File;
 use std::io::{Read, Result};
 
 const TRC_TRACE_CPU_CHANGE: u32 = 0x0001f003;
-const TRC_SCHED_MIN: u32 = 0x00021000;
+const TRC_SCHED_TO_RUN: u32 = 0x00021f0f;
 
 #[derive(Debug)]
 pub struct Parser {
@@ -116,7 +116,7 @@ impl Parser {
             let cpu = *extra.get(0).unwrap() as u8;
             self.cpu_current = cpu;
         } else {
-            let is_sched_min = code == (code & (TRC_SCHED_MIN | 0xf0f));
+            let is_sched_min = code == (code & TRC_SCHED_TO_RUN);
             if is_sched_min {
                 let dom_u32 = *extra.get(0).unwrap();
                 let dom = Domain::from_u32(dom_u32);
