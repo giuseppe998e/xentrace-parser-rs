@@ -3,8 +3,8 @@ pub use record::*;
 
 use std::collections::HashMap;
 use std::fs::File;
-use std::path::Path;
 use std::io::{Error, ErrorKind, Read, Result};
+use std::path::Path;
 
 const TRC_TRACE_CPU_CHANGE: u32 = 0x0001f003;
 const TRC_SCHED_TO_RUN: u32 = 0x00021f0f;
@@ -55,7 +55,7 @@ impl Parser {
                 match record {
                     Ok(r) => self.records.push(r),
                     Err(e) => match e.kind() {
-                        ErrorKind::Other => continue,
+                        ErrorKind::Other => {},
                         _ => break,
                     },
                 }
