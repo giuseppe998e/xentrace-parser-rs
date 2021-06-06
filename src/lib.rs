@@ -39,9 +39,8 @@ impl Parser {
         &self.records
     }
 
-    pub fn cpu_count(&self) -> u8 {
-        let cpu_max = self.cpu_domains.keys().max().unwrap();
-        cpu_max + 1
+    pub fn cpu_count(&self) -> Option<u8> {
+        self.cpu_domains.keys().max().map(|v| v + 1)
     }
 
     // PRIVATE FNs
@@ -55,7 +54,7 @@ impl Parser {
                 match record {
                     Ok(r) => self.records.push(r),
                     Err(e) => match e.kind() {
-                        ErrorKind::Other => {},
+                        ErrorKind::Other => {}
                         _ => break,
                     },
                 }
