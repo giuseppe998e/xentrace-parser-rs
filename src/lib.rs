@@ -74,14 +74,16 @@ impl Parser {
 
     fn read_tsc(hdr: u32, file: &mut File) -> Result<Option<u64>> {
         let in_tsc = (hdr & (1 << 31)) != 0;
-        match in_tsc {
-            false => Ok(None),
+        let tsc = match in_tsc {
             true => {
                 let mut buf = [0u8; 8];
                 file.read_exact(&mut buf)?;
-                Ok(Some(u64::from_ne_bytes(buf))) // host-endian because of XenTrace
+                Some(u64::from_ne_bytes(buf)) // host-endian because of XenTrace
             }
-        }
+            false => None,
+        };
+
+        Ok(tsc)
     }
 
     fn read_extra(hdr: u32, file: &mut File) -> Result<Vec<u32>> {
@@ -133,8 +135,8 @@ impl Parser {
         // Get current domain
         let domain = self.cpu_domains.get(&self.cpu_current);
         let domain = match domain {
-            None => Domain::default(),
             Some(&v) => v,
+            None => Domain::default(),
         };
 
         // Create record
