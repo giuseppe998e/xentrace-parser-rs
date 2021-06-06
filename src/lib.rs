@@ -3,8 +3,8 @@ pub use record::*;
 
 use std::collections::HashMap;
 use std::fs::File;
-use std::path::Path;
 use std::io::{Error, ErrorKind, Read, Result};
+use std::path::Path;
 
 const TRC_TRACE_CPU_CHANGE: u32 = 0x0001f003;
 const TRC_SCHED_TO_RUN: u32 = 0x00021f0f;
@@ -39,9 +39,8 @@ impl Parser {
         &self.records
     }
 
-    pub fn cpu_count(&self) -> u8 {
-        let cpu_max = self.cpu_domains.keys().max().unwrap();
-        cpu_max + 1
+    pub fn cpu_count(&self) -> Option<u8> {
+        self.cpu_domains.keys().max().map(|v| v + 1)
     }
 
     // PRIVATE FNs
@@ -55,7 +54,7 @@ impl Parser {
                 match record {
                     Ok(r) => self.records.push(r),
                     Err(e) => match e.kind() {
-                        ErrorKind::Other => continue,
+                        ErrorKind::Other => {}
                         _ => break,
                     },
                 }
@@ -74,14 +73,16 @@ impl Parser {
 
     fn read_tsc(hdr: u32, file: &mut File) -> Result<Option<u64>> {
         let in_tsc = (hdr & (1 << 31)) != 0;
-        match in_tsc {
-            false => Ok(None),
+        let tsc = match in_tsc {
             true => {
                 let mut buf = [0u8; 8];
                 file.read_exact(&mut buf)?;
-                Ok(Some(u64::from_ne_bytes(buf))) // host-endian because of XenTrace
+                Some(u64::from_ne_bytes(buf)) // host-endian because of XenTrace
             }
-        }
+            false => None,
+        };
+
+        Ok(tsc)
     }
 
     fn read_extra(hdr: u32, file: &mut File) -> Result<Vec<u32>> {
@@ -133,8 +134,8 @@ impl Parser {
         // Get current domain
         let domain = self.cpu_domains.get(&self.cpu_current);
         let domain = match domain {
-            None => Domain::default(),
             Some(&v) => v,
+            None => Domain::default(),
         };
 
         // Create record
