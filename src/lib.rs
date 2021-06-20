@@ -6,8 +6,8 @@ use std::fs::File;
 use std::io::{Error, ErrorKind, Read, Result};
 use std::path::Path;
 
-const TRC_TRACE_CPU_CHANGE: u32 = 0x0001f003;
-const TRC_SCHED_TO_RUN: u32 = 0x00021f0f;
+pub const TRC_TRACE_CPU_CHANGE: u32 = 0x0001f003;
+pub const TRC_SCHED_TO_RUN: u32 = 0x00021f0f;
 
 #[derive(Debug)]
 pub struct Parser {
