@@ -3,7 +3,7 @@ use std::cmp::Ordering;
 #[derive(Clone, Eq, Debug)]
 pub struct Event {
     code: u32,
-    tsc: Option<u64>,
+    tsc: u64,
     extra: Vec<u32>,
 }
 
@@ -12,7 +12,7 @@ impl Event {
     pub(crate) fn new(code: u32) -> Self {
         Self {
             code,
-            tsc: None,
+            tsc: 0,
             extra: Vec::new(),
         }
     }
@@ -22,7 +22,7 @@ impl Event {
     }
 
     pub(crate) fn set_tsc(&mut self, value: u64) {
-        self.tsc = Some(value);
+        self.tsc = value;
     }
 
     // PUBLIC FNs
@@ -34,7 +34,7 @@ impl Event {
         &self.extra
     }
 
-    pub fn get_tsc(&self) -> Option<u64> {
+    pub fn get_tsc(&self) -> u64 {
         self.tsc
     }
 }
@@ -79,10 +79,10 @@ mod tests {
     fn event_tsc() {
         let mut event = Event::new(EVENT_CODE);
 
-        assert_eq!(event.get_tsc(), None);
+        assert_eq!(event.get_tsc(), 0);
 
         event.set_tsc(1382371621213);
-        assert_eq!(event.get_tsc(), Some(1382371621213));
+        assert_eq!(event.get_tsc(), 1382371621213);
     }
 
     #[test]
