@@ -28,34 +28,34 @@ impl DomainType {
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Debug)]
 pub struct Domain {
-    tipe: DomainType, // "type" reserved
+    type_: DomainType, // "type" reserved
     vcpu: u16,
 }
 
 impl Domain {
     // CRATE FNs
-    pub(crate) fn new(tipe: DomainType, vcpu: u16) -> Self {
-        Self { tipe, vcpu }
+    pub(crate) fn new(type_: DomainType, vcpu: u16) -> Self {
+        Self { type_, vcpu }
     }
 
     pub(crate) fn from_u32(value: u32) -> Self {
         let vcpu = (value & 0x0000ffff) as u16;
         let id = (value >> 16) as u16;
-        let tipe = DomainType::from_id(id);
+        let type_ = DomainType::from_id(id);
 
-        Self::new(tipe, vcpu)
+        Self::new(type_, vcpu)
     }
 
     // PUBLIC FNs
     pub fn as_u32(&self) -> u32 {
-        let id = (self.tipe.to_id() as u32) << 16;
+        let id = (self.type_.to_id() as u32) << 16;
         let vcpu_u32 = self.vcpu as u32;
 
         id | vcpu_u32
     }
 
     pub fn get_type(&self) -> DomainType {
-        self.tipe
+        self.type_
     }
 
     pub fn get_vcpu(&self) -> u16 {
