@@ -14,7 +14,7 @@ fn main() -> std::io::Result<()> {
     for r in records {
         let _cpu: u8 = r.get_cpu(); // Host CPU
         let _domain: Domain = r.get_domain();
-        let _domType: DomainType = _domain.get_type();
+        let _dom_type: DomainType = _domain.get_type();
         let _event: Event = r.get_event();
 
         println!("{:?}", r);
