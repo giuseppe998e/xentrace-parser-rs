@@ -21,7 +21,7 @@ pub struct Parser {
 
 impl Parser {
     // PUBLIC FNs
-    pub fn new(path: &str) -> Result<Self> {
+    pub fn new(path: &str) -> Self {
         let mut instance = Self {
             // Host CPUs fiels
             cpu_current: 0,
@@ -31,8 +31,8 @@ impl Parser {
             records: Vec::new(),
         };
 
-        let _ = instance.read_file(path)?;
-        Ok(instance)
+        instance.read_file(path);
+        instance
     }
 
     pub fn get_records(&self) -> &Vec<Record> {
@@ -44,10 +44,10 @@ impl Parser {
     }
 
     // PRIVATE FNs
-    fn read_file(&mut self, path: &str) -> Result<()> {
+    fn read_file(&mut self, path: &str) {
         {
             let path_i = Path::new(path);
-            let mut file = File::open(path_i)?;
+            let mut file = File::open(path_i).unwrap();
 
             loop {
                 let record = self.read_record(&mut file);
@@ -60,7 +60,6 @@ impl Parser {
         } // File closed
 
         self.records.sort_unstable();
-        Ok(())
     }
 
     fn read_u32(file: &mut File) -> Result<u32> {
