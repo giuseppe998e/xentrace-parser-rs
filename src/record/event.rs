@@ -17,8 +17,8 @@ impl Event {
         }
     }
 
-    pub(crate) fn set_extra(&mut self, extra: &[u32]) {
-        self.extra.extend_from_slice(extra);
+    pub(crate) fn set_extra(&mut self, extra: Vec<u32>) {
+        self.extra = extra
     }
 
     pub(crate) fn set_tsc(&mut self, value: u64) {
@@ -89,7 +89,7 @@ mod tests {
     fn event_extra() {
         let mut event = Event::new(EVENT_CODE);
 
-        event.set_extra(&[1, 3, 5]);
+        event.set_extra(vec![1, 3, 5]);
         assert_eq!(event.get_extra().len(), 3);
         assert_eq!(event.get_extra()[2], 5);
     }

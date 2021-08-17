@@ -122,7 +122,7 @@ impl Parser {
 
         // Create event
         let mut event = Event::new(code);
-        event.set_extra(extra.as_slice());
+        event.set_extra(extra);
         match tsc {
             None => event.set_tsc(self.tsc_last),
             Some(v) => {
