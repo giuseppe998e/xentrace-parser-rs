@@ -5,16 +5,16 @@ This is the Rust lang version of a [project](https://github.com/giuseppe998e/xen
 
 ## Usage
 ```rust
-use xentrace_parser::{Parser, /*Record,*/ Event, Domain, DomainType};
+use xentrace_parser::{Domain, DomainType, /*Record,*/ Event, Parser};
 
 fn main() -> std::io::Result<()> {
-    let parser = Parser::new("/absolute/path/trace_xen.bin")?;
+    let parser = Parser::new("/path/to/trace.xen.dat")?;
     let records = parser.get_records(); // Vec<Record>
 
     for r in records {
         let _cpu: u8 = r.get_cpu(); // Host CPU
         let _domain: Domain = r.get_domain();
-        let _domType: DomainType = _domain.get_type();
+        let _dom_type: DomainType = _domain.get_type();
         let _event: Event = r.get_event();
 
         println!("{:?}", r);

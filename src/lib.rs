@@ -31,7 +31,7 @@ impl Parser {
             records: Vec::new(),
         };
 
-        let _ = instance.read_file(path)?;
+        instance.read_file(path)?;
         Ok(instance)
     }
 
@@ -39,12 +39,12 @@ impl Parser {
         &self.records
     }
 
-    pub fn cpu_count(&self) -> Option<u8> {
-        self.cpu_domains.keys().max().map(|v| v + 1)
+    pub fn cpu_count(&self) -> u8 {
+        self.cpu_domains.keys().max().map(|v| v + 1).unwrap()
     }
 
     // PRIVATE FNs
-    fn read_file(&mut self, path: &str) -> Result<()> {
+    fn read_file(&mut self, path: &str) -> Result<()>{
         {
             let path_i = Path::new(path);
             let mut file = File::open(path_i)?;
@@ -53,10 +53,11 @@ impl Parser {
                 let record = self.read_record(&mut file);
                 match record {
                     Ok(r) => self.records.push(r),
-                    Err(e) => match e.kind() {
-                        ErrorKind::Other => {}
-                        _ => break,
-                    },
+                    Err(e) => {
+                        if e.kind() != ErrorKind::Other {
+                            break;
+                        }
+                    }
                 }
             }
         } // File closed
@@ -72,7 +73,7 @@ impl Parser {
     }
 
     fn read_tsc(hdr: u32, file: &mut File) -> Result<Option<u64>> {
-        let in_tsc = (hdr & (1 << 31)) != 0;
+        let in_tsc = (hdr & (1 << 31)) > 0;
         let tsc = match in_tsc {
             true => {
                 let mut buf = [0u8; 8];
@@ -122,7 +123,7 @@ impl Parser {
 
         // Create event
         let mut event = Event::new(code);
-        event.set_extra(extra.as_slice());
+        event.set_extra(extra);
         match tsc {
             None => event.set_tsc(self.tsc_last),
             Some(v) => {
