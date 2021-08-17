@@ -53,7 +53,7 @@ impl Parser {
                 let record = self.read_record(&mut file);
                 match record {
                     Ok(r) => self.records.push(r),
-                    Err(e) if e.kind() == ErrorKind::Other => {} // Jump TRC_TRACE_CPU_CHANGE event
+                    Err(ref e) if e.kind() == ErrorKind::Other => {} // Jump TRC_TRACE_CPU_CHANGE event
                     Err(_) => break,
                 }
             }
