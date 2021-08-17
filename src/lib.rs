@@ -72,7 +72,7 @@ impl Parser {
     }
 
     fn read_tsc(hdr: u32, file: &mut File) -> Result<Option<u64>> {
-        let in_tsc = (hdr & (1 << 31)) != 0;
+        let in_tsc = (hdr & (1 << 31)) > 0;
         let tsc = match in_tsc {
             true => {
                 let mut buf = [0u8; 8];
