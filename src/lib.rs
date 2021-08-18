@@ -109,16 +109,13 @@ impl Parser {
 
         // Handle special events
         if code == TRC_TRACE_CPU_CHANGE {
-            let cpu = *extra.get(0).unwrap() as u8;
-            self.cpu_current = cpu;
-            return Err(Error::from(ErrorKind::Other)); // Do not save
-        } else {
-            let is_sched_min = code == (code & TRC_SCHED_TO_RUN);
-            if is_sched_min {
-                let dom_u32 = *extra.get(0).unwrap();
-                let dom = Domain::from_u32(dom_u32);
-                self.cpu_domains.insert(self.cpu_current, dom);
-            }
+            self.cpu_current = *extra.get(0).unwrap() as u8;
+            return Err(Error::from(ErrorKind::Other)); // Do not save that kind of events
+        } 
+        else if code == (code & TRC_SCHED_TO_RUN) {
+            let dom_u32 = *extra.get(0).unwrap();
+            let dom = Domain::from_u32(dom_u32);
+            self.cpu_domains.insert(self.cpu_current, dom);
         }
 
         // Create event
@@ -134,10 +131,7 @@ impl Parser {
 
         // Get current domain
         let domain = self.cpu_domains.get(&self.cpu_current);
-        let domain = match domain {
-            Some(&v) => v,
-            None => Domain::default(),
-        };
+        let domain = domain.map(|d| *d).unwrap_or_default();
 
         // Create record
         let record = Record::new(self.cpu_current, domain, event);
