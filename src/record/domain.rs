@@ -26,6 +26,12 @@ impl DomainType {
     }
 }
 
+impl Default for DomainType {
+    fn default() -> Self {
+        DomainType::Default
+    }
+}
+
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Debug)]
 pub struct Domain {
     type_: DomainType, // "type" reserved
@@ -65,7 +71,7 @@ impl Domain {
 
 impl Default for Domain {
     fn default() -> Self {
-        Domain::new(DomainType::Default, 0)
+        Domain::new(DomainType::default(), 0)
     }
 }
 
