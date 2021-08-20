@@ -9,20 +9,8 @@ pub struct Event {
 
 impl Event {
     // CRATE FNs
-    pub(crate) fn new(code: u32) -> Self {
-        Self {
-            code,
-            tsc: 0,
-            extra: Vec::new(),
-        }
-    }
-
-    pub(crate) fn set_extra(&mut self, extra: Vec<u32>) {
-        self.extra = extra
-    }
-
-    pub(crate) fn set_tsc(&mut self, value: u64) {
-        self.tsc = value;
+    pub(crate) fn new(code: u32, tsc: u64, extra: Vec<u32>) -> Self {
+        Self { code, tsc, extra }
     }
 
     // PUBLIC FNs
@@ -71,25 +59,19 @@ mod tests {
 
     #[test]
     fn event_new() {
-        let event = Event::new(EVENT_CODE);
-        assert_eq!(event, Event::new(EVENT_CODE));
+        let event = Event::new(EVENT_CODE, 0, vec![]);
+        assert_eq!(event, Event::new(EVENT_CODE, 0, vec![]));
     }
 
     #[test]
     fn event_tsc() {
-        let mut event = Event::new(EVENT_CODE);
-
-        assert_eq!(event.get_tsc(), 0);
-
-        event.set_tsc(1382371621213);
+        let event = Event::new(EVENT_CODE, 1382371621213, vec![]);
         assert_eq!(event.get_tsc(), 1382371621213);
     }
 
     #[test]
     fn event_extra() {
-        let mut event = Event::new(EVENT_CODE);
-
-        event.set_extra(vec![1, 3, 5]);
+        let event = Event::new(EVENT_CODE, 0, vec![1, 3, 5]);
         assert_eq!(event.get_extra().len(), 3);
         assert_eq!(event.get_extra()[2], 5);
     }
