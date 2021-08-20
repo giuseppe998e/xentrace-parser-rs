@@ -44,7 +44,7 @@ impl Parser {
     }
 
     // PRIVATE FNs
-    fn read_file(&mut self, path: &str) -> Result<()>{
+    fn read_file(&mut self, path: &str) -> Result<()> {
         {
             let path_i = Path::new(path);
             let mut file = File::open(path_i)?;
@@ -72,61 +72,58 @@ impl Parser {
         Ok(u32::from_ne_bytes(buf)) // host-endian because of XenTrace
     }
 
-    fn read_tsc(hdr: u32, file: &mut File) -> Result<Option<u64>> {
-        let in_tsc = (hdr & (1 << 31)) > 0;
-        let tsc = match in_tsc {
-            true => {
-                let mut buf = [0u8; 8];
-                file.read_exact(&mut buf)?;
-                Some(u64::from_ne_bytes(buf)) // host-endian because of XenTrace
-            }
-            false => None,
-        };
-
-        Ok(tsc)
+    fn read_u64(file: &mut File) -> Result<u64> {
+        let mut buf = [0u8; 8];
+        file.read_exact(&mut buf)?;
+        Ok(u64::from_ne_bytes(buf)) // host-endian because of XenTrace
     }
 
-    fn read_extra(hdr: u32, file: &mut File) -> Result<Vec<u32>> {
-        let n_extra = (hdr >> 28) & 7;
-        let mut extra: Vec<u32> = Vec::new();
+    fn read_event(&mut self, file: &mut File) -> Result<Event> {
+        // Read header
+        let hdr = Self::read_u32(file)?;
+        let code = hdr & 0x0fffffff;
 
-        for _ in 0..n_extra {
-            let value = Self::read_u32(file)?;
-            extra.push(value);
-        }
+        // Read TSC
+        let tsc = {
+            let in_tsc = (hdr & (1 << 31)) > 0;
+            if in_tsc {
+                self.tsc_last = Self::read_u64(file)?;
+            }
+            self.tsc_last
+        };
 
-        Ok(extra)
+        // Read extras
+        let extra = {
+            let n_extra = (hdr >> 28) & 7;
+            let mut extra = Vec::new();
+            for _ in 0..n_extra {
+                let val = Self::read_u32(file)?;
+                extra.push(val);
+            }
+            extra
+        };
+
+        // Create Event
+        let mut event = Event::new(code);
+        event.set_extra(extra);
+        event.set_tsc(tsc);
+        Ok(event)
     }
 
     fn read_record(&mut self, file: &mut File) -> Result<Record> {
-        // Read header
-        let hdr = Self::read_u32(file)?;
-
-        // Read event data
-        let code = hdr & 0x0fffffff;
-        let tsc = Self::read_tsc(hdr, file)?;
-        let extra = Self::read_extra(hdr, file)?;
+        let event = self.read_event(file)?;
+        let code = event.get_code();
+        let extra = event.get_extra();
 
         // Handle special events
         if code == TRC_TRACE_CPU_CHANGE {
             self.cpu_current = *extra.get(0).unwrap() as u8;
             return Err(Error::from(ErrorKind::Other)); // Do not save that kind of events
-        } 
-        else if code == (code & TRC_SCHED_TO_RUN) {
+        } else if code == (code & TRC_SCHED_TO_RUN) {
+            // XXX Move after "get current dom" ?
             let dom_u32 = *extra.get(0).unwrap();
             let dom = Domain::from_u32(dom_u32);
             self.cpu_domains.insert(self.cpu_current, dom);
-        }
-
-        // Create event
-        let mut event = Event::new(code);
-        event.set_extra(extra);
-        match tsc {
-            None => event.set_tsc(self.tsc_last),
-            Some(v) => {
-                self.tsc_last = v;
-                event.set_tsc(v);
-            }
         }
 
         // Get current domain
