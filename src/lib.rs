@@ -104,9 +104,7 @@ impl Parser {
         };
 
         // Create Event
-        let mut event = Event::new(code);
-        event.set_extra(extra);
-        event.set_tsc(tsc);
+        let event = Event::new(code, tsc, extra);
         Ok(event)
     }
 

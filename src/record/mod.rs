@@ -58,11 +58,11 @@ mod tests {
     #[test]
     fn record() {
         let domain = Domain::from_u32(0x00018000);
-        let event = Event::new(0x0001f003);
+        let event = Event::new(0x0001f003, 0, vec![]);
         let record = Record::new(5, domain, event);
 
         assert_eq!(record.get_cpu(), 5);
         assert_eq!(record.get_domain(), domain);
-        assert_eq!(record.get_event(), Event::new(0x0001f003));
+        assert_eq!(record.get_event(), Event::new(0x0001f003, 0, vec![]));
     }
 }
