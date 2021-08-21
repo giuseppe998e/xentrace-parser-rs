@@ -12,8 +12,8 @@ pub const TRC_SCHED_TO_RUN: u32 = 0x00021f0f;
 #[derive(Debug)]
 pub struct Parser {
     // Host CPUs fiels
-    cpu_current: u8,
-    cpu_domains: HashMap<u8, Domain>,
+    cpu_current: u16,
+    cpu_domains: HashMap<u16, Domain>,
     // Records fiels
     tsc_last: u64,
     records: Vec<Record>,
@@ -31,28 +31,14 @@ impl Parser {
             records: Vec::new(),
         };
 
-        instance.read_file(path)?;
-        Ok(instance)
-    }
-
-    pub fn get_records(&self) -> &Vec<Record> {
-        &self.records
-    }
-
-    pub fn cpu_count(&self) -> u8 {
-        self.cpu_domains.keys().max().map(|v| v + 1).unwrap()
-    }
-
-    // PRIVATE FNs
-    fn read_file(&mut self, path: &str) -> Result<()> {
         {
             let path_i = Path::new(path);
             let mut file = File::open(path_i)?;
 
             loop {
-                let record = self.read_record(&mut file);
+                let record = instance.read_record(&mut file);
                 match record {
-                    Ok(r) => self.records.push(r),
+                    Ok(r) => instance.records.push(r),
                     Err(e) => {
                         if e.kind() != ErrorKind::Other {
                             break;
@@ -62,10 +48,19 @@ impl Parser {
             }
         } // File closed
 
-        self.records.sort_unstable();
-        Ok(())
+        instance.records.sort_unstable();
+        Ok(instance)
     }
 
+    pub fn get_records(&self) -> &Vec<Record> {
+        &self.records
+    }
+
+    pub fn cpu_count(&self) -> u16 {
+        self.cpu_domains.keys().max().map(|v| v + 1).unwrap()
+    }
+
+    // PRIVATE FNs
     fn read_u32(file: &mut File) -> Result<u32> {
         let mut buf = [0u8; 4];
         file.read_exact(&mut buf)?;
@@ -113,20 +108,20 @@ impl Parser {
         let code = event.get_code();
         let extra = event.get_extra();
 
-        // Handle special events
+        // Handle TRC_TRACE_CPU_CHANGE event
         if code == TRC_TRACE_CPU_CHANGE {
-            self.cpu_current = *extra.get(0).unwrap() as u8;
+            self.cpu_current = *extra.get(0).unwrap() as u16;
             return Err(Error::from(ErrorKind::Other)); // Do not save that kind of events
-        } else if code == (code & TRC_SCHED_TO_RUN) {
-            // XXX Move after "get current dom" ?
-            let dom_u32 = *extra.get(0).unwrap();
-            let dom = Domain::from_u32(dom_u32);
-            self.cpu_domains.insert(self.cpu_current, dom);
         }
 
         // Get current domain
-        let domain = self.cpu_domains.get(&self.cpu_current);
-        let domain = domain.map(|d| *d).unwrap_or_default();
+        let domain = if code == (code & TRC_SCHED_TO_RUN) {
+            let dom = *extra.get(0).unwrap();
+            let dom = Domain::from_u32(dom);
+            self.cpu_domains.insert(self.cpu_current, dom).unwrap_or_default()
+        } else {
+            self.cpu_domains.get(&self.cpu_current).map(|d| *d).unwrap_or_default()
+        };
 
         // Create record
         let record = Record::new(self.cpu_current, domain, event);
