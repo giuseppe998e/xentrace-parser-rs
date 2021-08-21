@@ -31,7 +31,24 @@ impl Parser {
             records: Vec::new(),
         };
 
-        instance.read_file(path)?;
+        {
+            let path_i = Path::new(path);
+            let mut file = File::open(path_i)?;
+
+            loop {
+                let record = instance.read_record(&mut file);
+                match record {
+                    Ok(r) => instance.records.push(r),
+                    Err(e) => {
+                        if e.kind() != ErrorKind::Other {
+                            break;
+                        }
+                    }
+                }
+            }
+        } // File closed
+
+        instance.records.sort_unstable();
         Ok(instance)
     }
 
@@ -44,28 +61,6 @@ impl Parser {
     }
 
     // PRIVATE FNs
-    fn read_file(&mut self, path: &str) -> Result<()> {
-        {
-            let path_i = Path::new(path);
-            let mut file = File::open(path_i)?;
-
-            loop {
-                let record = self.read_record(&mut file);
-                match record {
-                    Ok(r) => self.records.push(r),
-                    Err(e) => {
-                        if e.kind() != ErrorKind::Other {
-                            break;
-                        }
-                    }
-                }
-            }
-        } // File closed
-
-        self.records.sort_unstable();
-        Ok(())
-    }
-
     fn read_u32(file: &mut File) -> Result<u32> {
         let mut buf = [0u8; 4];
         file.read_exact(&mut buf)?;
