@@ -99,8 +99,7 @@ impl Parser {
         };
 
         // Create Event
-        let event = Event::new(code, tsc, extra);
-        Ok(event)
+        Ok(Event::new(code, tsc, extra))
     }
 
     fn read_record(&mut self, file: &mut File) -> Result<Record> {
@@ -129,7 +128,6 @@ impl Parser {
         };
 
         // Create record
-        let record = Record::new(self.cpu_current, domain, event);
-        Ok(record)
+        Ok(Record::new(self.cpu_current, domain, event))
     }
 }
