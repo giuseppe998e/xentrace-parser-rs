@@ -113,20 +113,20 @@ impl Parser {
         let code = event.get_code();
         let extra = event.get_extra();
 
-        // Handle special events
+        // Handle TRC_TRACE_CPU_CHANGE event
         if code == TRC_TRACE_CPU_CHANGE {
             self.cpu_current = *extra.get(0).unwrap() as u8;
             return Err(Error::from(ErrorKind::Other)); // Do not save that kind of events
-        } else if code == (code & TRC_SCHED_TO_RUN) {
-            // XXX Move after "get current dom" ?
-            let dom_u32 = *extra.get(0).unwrap();
-            let dom = Domain::from_u32(dom_u32);
-            self.cpu_domains.insert(self.cpu_current, dom);
         }
 
         // Get current domain
-        let domain = self.cpu_domains.get(&self.cpu_current);
-        let domain = domain.map(|d| *d).unwrap_or_default();
+        let domain = if code == (code & TRC_SCHED_TO_RUN) {
+            let dom = *extra.get(0).unwrap();
+            let dom = Domain::from_u32(dom);
+            self.cpu_domains.insert(self.cpu_current, dom).unwrap_or_default()
+        } else {
+            self.cpu_domains.get(&self.cpu_current).map(|d| *d).unwrap_or_default()
+        };
 
         // Create record
         let record = Record::new(self.cpu_current, domain, event);
