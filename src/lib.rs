@@ -12,8 +12,8 @@ pub const TRC_SCHED_TO_RUN: u32 = 0x00021f0f;
 #[derive(Debug)]
 pub struct Parser {
     // Host CPUs fiels
-    cpu_current: u8,
-    cpu_domains: HashMap<u8, Domain>,
+    cpu_current: u16,
+    cpu_domains: HashMap<u16, Domain>,
     // Records fiels
     tsc_last: u64,
     records: Vec<Record>,
@@ -56,7 +56,7 @@ impl Parser {
         &self.records
     }
 
-    pub fn cpu_count(&self) -> u8 {
+    pub fn cpu_count(&self) -> u16 {
         self.cpu_domains.keys().max().map(|v| v + 1).unwrap()
     }
 
@@ -110,7 +110,7 @@ impl Parser {
 
         // Handle TRC_TRACE_CPU_CHANGE event
         if code == TRC_TRACE_CPU_CHANGE {
-            self.cpu_current = *extra.get(0).unwrap() as u8;
+            self.cpu_current = *extra.get(0).unwrap() as u16;
             return Err(Error::from(ErrorKind::Other)); // Do not save that kind of events
         }
 

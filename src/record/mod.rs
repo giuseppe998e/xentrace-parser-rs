@@ -8,19 +8,19 @@ use std::cmp::Ordering;
 
 #[derive(Clone, Eq, Debug)]
 pub struct Record {
-    cpu: u8,
+    cpu: u16,
     domain: Domain,
     event: Event,
 }
 
 impl Record {
     // CRATE FNs
-    pub(crate) fn new(cpu: u8, domain: Domain, event: Event) -> Self {
+    pub(crate) fn new(cpu: u16, domain: Domain, event: Event) -> Self {
         Self { cpu, domain, event }
     }
 
     // PUBLIC FNs
-    pub fn get_cpu(&self) -> u8 {
+    pub fn get_cpu(&self) -> u16 {
         self.cpu
     }
 
