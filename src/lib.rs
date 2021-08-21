@@ -118,9 +118,14 @@ impl Parser {
         let domain = if code == (code & TRC_SCHED_TO_RUN) {
             let dom = *extra.get(0).unwrap();
             let dom = Domain::from_u32(dom);
-            self.cpu_domains.insert(self.cpu_current, dom).unwrap_or_default()
+            self.cpu_domains
+                .insert(self.cpu_current, dom)
+                .unwrap_or_default()
         } else {
-            self.cpu_domains.get(&self.cpu_current).map(|d| *d).unwrap_or_default()
+            self.cpu_domains
+                .get(&self.cpu_current)
+                .map(|d| *d)
+                .unwrap_or_default()
         };
 
         // Create record
