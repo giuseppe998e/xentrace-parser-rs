@@ -1,8 +1,8 @@
 mod domain;
-pub use domain::*;
-
 mod event;
-pub use event::Event;
+
+pub use domain::*;
+pub use event::*;
 
 use std::cmp::Ordering;
 
@@ -54,15 +54,19 @@ impl PartialOrd for Record {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::TRC_TRACE_CPU_CHANGE;
 
     #[test]
     fn record() {
         let domain = Domain::from_u32(0x00018000);
-        let event = Event::new(0x0001f003, 0, vec![]);
+        let event = Event::new(TRC_TRACE_CPU_CHANGE, 0, vec![]);
         let record = Record::new(5, domain, event);
 
         assert_eq!(record.get_cpu(), 5);
         assert_eq!(record.get_domain(), domain);
-        assert_eq!(record.get_event(), Event::new(0x0001f003, 0, vec![]));
+        assert_eq!(
+            record.get_event(),
+            Event::new(TRC_TRACE_CPU_CHANGE, 0, vec![])
+        );
     }
 }

@@ -1,4 +1,5 @@
 mod record;
+
 pub use record::*;
 
 use std::collections::HashMap;
@@ -76,7 +77,7 @@ impl Parser {
     fn read_event(&mut self, file: &mut File) -> Result<Event> {
         // Read header
         let hdr = Self::read_u32(file)?;
-        let code = hdr & 0x0fffffff;
+        let code = hdr & 0x0FFFFFFF;
 
         // Read TSC
         let tsc = {
@@ -99,13 +100,12 @@ impl Parser {
         };
 
         // Create Event
-        let event = Event::new(code, tsc, extra);
-        Ok(event)
+        Ok(Event::new(code, tsc, extra))
     }
 
     fn read_record(&mut self, file: &mut File) -> Result<Record> {
         let event = self.read_event(file)?;
-        let code = event.get_code();
+        let code = event.get_code().into_u32();
         let extra = event.get_extra();
 
         // Handle TRC_TRACE_CPU_CHANGE event
@@ -118,13 +118,17 @@ impl Parser {
         let domain = if code == (code & TRC_SCHED_TO_RUN) {
             let dom = *extra.get(0).unwrap();
             let dom = Domain::from_u32(dom);
-            self.cpu_domains.insert(self.cpu_current, dom).unwrap_or_default()
+            self.cpu_domains
+                .insert(self.cpu_current, dom)
+                .unwrap_or_default()
         } else {
-            self.cpu_domains.get(&self.cpu_current).map(|d| *d).unwrap_or_default()
+            self.cpu_domains
+                .get(&self.cpu_current)
+                .map(|d| *d)
+                .unwrap_or_default()
         };
 
         // Create record
-        let record = Record::new(self.cpu_current, domain, event);
-        Ok(record)
+        Ok(Record::new(self.cpu_current, domain, event))
     }
 }
