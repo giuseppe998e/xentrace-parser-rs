@@ -13,7 +13,7 @@ pub struct EventCode {
 }
 
 impl EventCode {
-    pub(crate) fn from_u32(code: u32) -> Self {
+    pub fn from_u32(code: u32) -> Self {
         Self {
             code,
             main: ((code & 0x0FFF0000) >> 16).try_into().unwrap(),
@@ -22,19 +22,19 @@ impl EventCode {
         }
     }
 
-    pub(crate) fn into_u32(&self) -> u32 {
+    pub fn into_u32(&self) -> u32 {
         self.code
     }
 
-    pub(crate) fn get_main(&self) -> u16 {
+    pub fn get_main(&self) -> u16 {
         self.main
     }
 
-    pub(crate) fn get_sub(&self) -> u8 {
+    pub fn get_sub(&self) -> u8 {
         self.sub
     }
 
-    pub(crate) fn get_minor(&self) -> u16 {
+    pub fn get_minor(&self) -> u16 {
         self.minor
     }
 }

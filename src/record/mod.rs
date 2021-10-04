@@ -2,7 +2,7 @@ mod domain;
 mod event;
 
 pub use domain::*;
-pub use event::Event;
+pub use event::*;
 
 use std::cmp::Ordering;
 
