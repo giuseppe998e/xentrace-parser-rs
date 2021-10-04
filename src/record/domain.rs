@@ -16,7 +16,7 @@ impl DomainType {
         }
     }
 
-    pub fn to_id(&self) -> u16 {
+    pub fn into_id(&self) -> u16 {
         match self {
             Self::Zero => 0,
             Self::Idle => 32767,
@@ -45,7 +45,7 @@ impl Domain {
     }
 
     pub(crate) fn from_u32(value: u32) -> Self {
-        let vcpu = (value & 0x0000ffff) as u16;
+        let vcpu = (value & 0x0000FFFF) as u16;
         let id = (value >> 16) as u16;
         let type_ = DomainType::from_id(id);
 
@@ -54,10 +54,10 @@ impl Domain {
 
     // PUBLIC FNs
     pub fn as_u32(&self) -> u32 {
-        let id = (self.type_.to_id() as u32) << 16;
+        let type_id = (self.type_.into_id() as u32) << 16;
         let vcpu_u32 = self.vcpu as u32;
 
-        id | vcpu_u32
+        type_id | vcpu_u32
     }
 
     pub fn get_type(&self) -> DomainType {
@@ -102,7 +102,7 @@ mod tests {
 
         assert_eq!(domtype, DomainType::Default);
         assert_eq!(domtype, DomainType::from_id(32768));
-        assert_eq!(domtype.to_id(), 32768)
+        assert_eq!(domtype.into_id(), 32768)
     }
 
     #[test]
@@ -111,6 +111,6 @@ mod tests {
 
         assert_eq!(domtype, DomainType::Guest(5));
         assert_eq!(domtype, DomainType::from_id(5));
-        assert_eq!(domtype.to_id(), 5)
+        assert_eq!(domtype.into_id(), 5)
     }
 }

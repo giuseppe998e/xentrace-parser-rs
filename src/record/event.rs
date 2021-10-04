@@ -1,8 +1,57 @@
-use std::cmp::Ordering;
+use std::{
+    cmp::Ordering,
+    convert::TryInto,
+    fmt::{Debug, Formatter, Result},
+};
 
-#[derive(Clone, Eq, Debug)]
-pub struct Event {
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub struct EventCode {
     code: u32,
+    main: u16,
+    sub: u8,
+    minor: u16,
+}
+
+impl EventCode {
+    pub(crate) fn from_u32(code: u32) -> Self {
+        Self {
+            code,
+            main: ((code & 0x0FFF0000) >> 16).try_into().unwrap(),
+            sub: ((code & 0x0000F000) >> 12).try_into().unwrap(),
+            minor: (code & 0x00000FFF).try_into().unwrap(),
+        }
+    }
+
+    pub(crate) fn into_u32(&self) -> u32 {
+        self.code
+    }
+
+    pub(crate) fn get_main(&self) -> u16 {
+        self.main
+    }
+
+    pub(crate) fn get_sub(&self) -> u8 {
+        self.sub
+    }
+
+    pub(crate) fn get_minor(&self) -> u16 {
+        self.minor
+    }
+}
+
+impl Debug for EventCode {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
+        write!(
+            f,
+            "EventCode {{ main: {:#06X}, sub: {:#03X}, minor: {:#05X} }}",
+            self.main, self.sub, self.minor
+        )
+    }
+}
+
+#[derive(Debug, Clone, Eq)]
+pub struct Event {
+    code: EventCode,
     tsc: u64,
     extra: Vec<u32>,
 }
@@ -10,11 +59,15 @@ pub struct Event {
 impl Event {
     // CRATE FNs
     pub(crate) fn new(code: u32, tsc: u64, extra: Vec<u32>) -> Self {
-        Self { code, tsc, extra }
+        Self {
+            code: EventCode::from_u32(code),
+            tsc,
+            extra,
+        }
     }
 
     // PUBLIC FNs
-    pub fn get_code(&self) -> u32 {
+    pub fn get_code(&self) -> EventCode {
         self.code
     }
 
@@ -54,24 +107,23 @@ impl PartialOrd for Event {
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    const EVENT_CODE: u32 = 0x0001f003;
+    use crate::TRC_TRACE_CPU_CHANGE;
 
     #[test]
     fn event_new() {
-        let event = Event::new(EVENT_CODE, 0, vec![]);
-        assert_eq!(event, Event::new(EVENT_CODE, 0, vec![]));
+        let event = Event::new(TRC_TRACE_CPU_CHANGE, 0, vec![]);
+        assert_eq!(event, Event::new(TRC_TRACE_CPU_CHANGE, 0, vec![]));
     }
 
     #[test]
     fn event_tsc() {
-        let event = Event::new(EVENT_CODE, 1382371621213, vec![]);
+        let event = Event::new(TRC_TRACE_CPU_CHANGE, 1382371621213, vec![]);
         assert_eq!(event.get_tsc(), 1382371621213);
     }
 
     #[test]
     fn event_extra() {
-        let event = Event::new(EVENT_CODE, 0, vec![1, 3, 5]);
+        let event = Event::new(TRC_TRACE_CPU_CHANGE, 0, vec![1, 3, 5]);
         assert_eq!(event.get_extra().len(), 3);
         assert_eq!(event.get_extra()[2], 5);
     }

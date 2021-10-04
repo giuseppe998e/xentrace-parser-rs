@@ -1,4 +1,5 @@
 mod record;
+
 pub use record::*;
 
 use std::collections::HashMap;
@@ -76,7 +77,7 @@ impl Parser {
     fn read_event(&mut self, file: &mut File) -> Result<Event> {
         // Read header
         let hdr = Self::read_u32(file)?;
-        let code = hdr & 0x0fffffff;
+        let code = hdr & 0x0FFFFFFF;
 
         // Read TSC
         let tsc = {
@@ -104,7 +105,7 @@ impl Parser {
 
     fn read_record(&mut self, file: &mut File) -> Result<Record> {
         let event = self.read_event(file)?;
-        let code = event.get_code();
+        let code = event.get_code().into_u32();
         let extra = event.get_extra();
 
         // Handle TRC_TRACE_CPU_CHANGE event
