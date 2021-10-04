@@ -53,7 +53,7 @@ impl Domain {
     }
 
     // PUBLIC FNs
-    pub fn as_u32(&self) -> u32 {
+    pub fn into_u32(&self) -> u32 {
         let type_id = (self.type_.into_id() as u32) << 16;
         let vcpu_u32 = self.vcpu as u32;
 
