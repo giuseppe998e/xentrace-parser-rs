@@ -7,7 +7,7 @@ pub enum DomainType {
 }
 
 impl DomainType {
-    pub(crate) fn from_id(val: u16) -> Self {
+    pub fn from_id(val: u16) -> Self {
         match val {
             0 => Self::Zero,
             32767 => Self::Idle,
