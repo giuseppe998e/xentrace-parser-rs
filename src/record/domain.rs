@@ -91,7 +91,7 @@ mod tests {
     fn dom_getters() {
         let dom = Domain::new(DomainType::Default, 1);
 
-        assert_eq!(dom.as_u32(), 0x80000001);
+        assert_eq!(dom.into_u32(), 0x80000001);
         assert_eq!(dom.get_type(), DomainType::Default);
         assert_eq!(dom.get_vcpu(), 1);
     }
