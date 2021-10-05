@@ -115,7 +115,7 @@ impl Parser {
 
         // Get or create the Domain struct
         let domain = *self.cpu_domains.entry(self.cpu_current).or_insert_with(|| {
-            Domain::from_u32(extra_0/*dom*/)
+            Domain::from_u32(extra_0 /*dom*/)
         });
 
         // Create record
