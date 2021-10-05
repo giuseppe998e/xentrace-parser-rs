@@ -105,15 +105,17 @@ impl Parser {
         let code = event.get_code().into_u32();
         let extra = event.get_extra();
 
+        let extra_0 = *extra.get(0).unwrap();
+
         // Handle TRC_TRACE_CPU_CHANGE event
         if code == TRC_TRACE_CPU_CHANGE {
-            self.cpu_current = *extra.get(0).unwrap() as u16;
+            self.cpu_current = extra_0 as u16;
             return Err(Error::from(ErrorKind::Other)); // Do not save that kind of events
         }
 
+        // Get or create the Domain struct
         let domain = *self.cpu_domains.entry(self.cpu_current).or_insert_with(|| {
-            let dom = *extra.get(0).unwrap();
-            Domain::from_u32(dom)
+            Domain::from_u32(extra_0/*dom*/)
         });
 
         // Create record
