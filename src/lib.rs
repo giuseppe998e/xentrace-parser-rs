@@ -40,11 +40,8 @@ impl Parser {
                 let record = instance.read_record(&mut file);
                 match record {
                     Ok(r) => instance.records.push(r),
-                    Err(e) => {
-                        if e.kind() != ErrorKind::Other {
-                            break;
-                        }
-                    }
+                    Err(e) if e.kind() != ErrorKind::Other => break,
+                    Err(_) => (),
                 }
             }
         } // File closed
