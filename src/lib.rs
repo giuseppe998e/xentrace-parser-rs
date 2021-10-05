@@ -111,19 +111,10 @@ impl Parser {
             return Err(Error::from(ErrorKind::Other)); // Do not save that kind of events
         }
 
-        // Get current domain
-        let domain = if code == (code & TRC_SCHED_TO_RUN) {
+        let domain = *self.cpu_domains.entry(self.cpu_current).or_insert_with(|| {
             let dom = *extra.get(0).unwrap();
-            let dom = Domain::from_u32(dom);
-            self.cpu_domains
-                .insert(self.cpu_current, dom)
-                .unwrap_or_default()
-        } else {
-            self.cpu_domains
-                .get(&self.cpu_current)
-                .map(|d| *d)
-                .unwrap_or_default()
-        };
+            Domain::from_u32(dom)
+        });
 
         // Create record
         Ok(Record::new(self.cpu_current, domain, event))
