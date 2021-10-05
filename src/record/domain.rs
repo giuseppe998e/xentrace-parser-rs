@@ -46,8 +46,10 @@ impl Domain {
 
     pub(crate) fn from_u32(value: u32) -> Self {
         let vcpu = (value & 0x0000FFFF) as u16;
-        let id = (value >> 16) as u16;
-        let type_ = DomainType::from_id(id);
+        let type_ = {
+            let id = (value >> 16) as u16;
+            DomainType::from_id(id)
+        };
 
         Self::new(type_, vcpu)
     }

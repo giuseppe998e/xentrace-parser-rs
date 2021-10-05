@@ -1,11 +1,11 @@
-mod record;
-
-pub use record::*;
+pub mod record;
 
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::{Error, ErrorKind, Read, Result};
 use std::path::Path;
+
+use record::*;
 
 pub const TRC_TRACE_CPU_CHANGE: u32 = 0x0001f003;
 pub const TRC_SCHED_TO_RUN: u32 = 0x00021f0f;
@@ -40,11 +40,8 @@ impl Parser {
                 let record = instance.read_record(&mut file);
                 match record {
                     Ok(r) => instance.records.push(r),
-                    Err(e) => {
-                        if e.kind() != ErrorKind::Other {
-                            break;
-                        }
-                    }
+                    Err(e) if e.kind() != ErrorKind::Other => break,
+                    Err(_) => (),
                 }
             }
         } // File closed
@@ -108,25 +105,22 @@ impl Parser {
         let code = event.get_code().into_u32();
         let extra = event.get_extra();
 
+        let extra_0 = *extra.get(0).unwrap_or(&0);
+
         // Handle TRC_TRACE_CPU_CHANGE event
         if code == TRC_TRACE_CPU_CHANGE {
-            self.cpu_current = *extra.get(0).unwrap() as u16;
+            self.cpu_current = extra_0 as u16;
             return Err(Error::from(ErrorKind::Other)); // Do not save that kind of events
         }
 
         // Get current domain
         let domain = if code == (code & TRC_SCHED_TO_RUN) {
-            let dom = *extra.get(0).unwrap();
-            let dom = Domain::from_u32(dom);
-            self.cpu_domains
-                .insert(self.cpu_current, dom)
-                .unwrap_or_default()
+            let dom = Domain::from_u32(extra_0);
+            self.cpu_domains.insert(self.cpu_current, dom)
         } else {
-            self.cpu_domains
-                .get(&self.cpu_current)
-                .map(|d| *d)
-                .unwrap_or_default()
-        };
+            self.cpu_domains.get(&self.cpu_current).map(|d| *d)
+        }
+        .unwrap_or_default();
 
         // Create record
         Ok(Record::new(self.cpu_current, domain, event))

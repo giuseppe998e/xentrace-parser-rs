@@ -43,8 +43,8 @@ impl Debug for EventCode {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
         write!(
             f,
-            "EventCode {{ main: {:#06X}, sub: {:#03X}, minor: {:#05X} }}",
-            self.main, self.sub, self.minor
+            "EventCode {{ code: {:#010X}, main: {:#06X}, sub: {:#03X}, minor: {:#05X} }}",
+            self.code, self.main, self.sub, self.minor
         )
     }
 }
@@ -71,8 +71,8 @@ impl Event {
         self.code
     }
 
-    pub fn get_extra(&self) -> &Vec<u32> {
-        &self.extra
+    pub fn get_extra(&self) -> &[u32] {
+        self.extra.as_slice()
     }
 
     pub fn get_tsc(&self) -> u64 {

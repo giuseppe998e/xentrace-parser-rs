@@ -5,7 +5,7 @@ This is the Rust lang version of a [project](https://github.com/giuseppe998e/xen
 
 ## Usage
 ```rust
-use xentrace_parser::{Domain, DomainType, /*Record,*/ Event, Parser};
+use xentrace_parser::{Parser, record::{Domain, DomainType /*, Record*/, Event /*, EventCode*/}};
 
 fn main() -> std::io::Result<()> {
     let parser = Parser::new("/path/to/trace.xen.dat")?;
