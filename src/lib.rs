@@ -105,7 +105,7 @@ impl Parser {
         let code = event.get_code().into_u32();
         let extra = event.get_extra();
 
-        let extra_0 = *extra.get(0).unwrap();
+        let extra_0 = *extra.get(0).unwrap_or(&0);
 
         // Handle TRC_TRACE_CPU_CHANGE event
         if code == TRC_TRACE_CPU_CHANGE {
@@ -113,10 +113,14 @@ impl Parser {
             return Err(Error::from(ErrorKind::Other)); // Do not save that kind of events
         }
 
-        // Get or create the Domain struct
-        let domain = *self.cpu_domains.entry(self.cpu_current).or_insert_with(|| {
-            Domain::from_u32(extra_0 /*dom*/)
-        });
+        // Get current domain
+        let domain = if code == (code & TRC_SCHED_TO_RUN) {
+            let dom = Domain::from_u32(extra_0);
+            self.cpu_domains.insert(self.cpu_current, dom)
+        } else {
+            self.cpu_domains.get(&self.cpu_current).map(|d| *d)
+        }
+        .unwrap_or_default();
 
         // Create record
         Ok(Record::new(self.cpu_current, domain, event))
