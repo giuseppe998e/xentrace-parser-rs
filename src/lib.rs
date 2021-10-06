@@ -88,7 +88,7 @@ impl Parser {
         // Read extras
         let extra = {
             let n_extra = (hdr >> 28) & 7;
-            let mut extra = Vec::new();
+            let mut extra = Vec::with_capacity(n_extra as usize);
             for _ in 0..n_extra {
                 let val = Self::read_u32(file)?;
                 extra.push(val);

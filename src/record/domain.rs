@@ -44,7 +44,8 @@ impl Domain {
         Self { type_, vcpu }
     }
 
-    pub(crate) fn from_u32(value: u32) -> Self {
+    // PUBLIC FNs
+    pub fn from_u32(value: u32) -> Self {
         let vcpu = (value & 0x0000FFFF) as u16;
         let type_ = {
             let id = (value >> 16) as u16;
@@ -54,7 +55,6 @@ impl Domain {
         Self::new(type_, vcpu)
     }
 
-    // PUBLIC FNs
     pub fn into_u32(&self) -> u32 {
         let type_id = (self.type_.into_id() as u32) << 16;
         let vcpu_u32 = self.vcpu as u32;
