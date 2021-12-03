@@ -7,6 +7,6 @@ readme = "README.md"
 license = "LGPL-2.1-or-later"
 keywords = ["xen", "xentrace", "trace", "parser", "analyzer"]
 repository = "https://github.com/giuseppe998e/xentrace-parser-rs"
-edition = "2018"
+edition = "2021"
 
 [dependencies]
