@@ -118,7 +118,7 @@ impl Parser {
             let dom = Domain::from_u32(extra_0);
             self.cpu_domains.insert(self.cpu_current, dom)
         } else {
-            self.cpu_domains.get(&self.cpu_current).map(|d| *d)
+            self.cpu_domains.get(&self.cpu_current).copied()
         }
         .unwrap_or_default();
 
