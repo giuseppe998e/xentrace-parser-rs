@@ -1,128 +1,121 @@
+pub mod codes;
+use codes::*;
+
 pub mod record;
+use record::{Domain, Event, EventCode, Record};
 
-use std::collections::HashMap;
-use std::fs::File;
-use std::io::{Error, ErrorKind, Read, Result};
-use std::path::Path;
+mod trace;
+pub use trace::Trace;
 
-use record::*;
+use std::{
+    collections::HashMap,
+    fs::File,
+    io::{Error, ErrorKind, Read, Result},
+    path::Path,
+};
 
-pub const TRC_TRACE_CPU_CHANGE: u32 = 0x0001f003;
-pub const TRC_SCHED_TO_RUN: u32 = 0x00021f0f;
+pub fn xentrace_parse(path: &str) -> Result<Trace> {
+    let mut trace = Trace::default();
 
-#[derive(Debug)]
-pub struct Parser {
-    // Host CPUs fiels
-    cpu_current: u16,
-    cpu_domains: HashMap<u16, Domain>,
-    // Records fiels
-    tsc_last: u64,
-    records: Vec<Record>,
+    {
+        let path_i = Path::new(path);
+        let mut file = File::open(path_i)?;
+
+        let mut last_tsc = 0u64;
+        let mut current_cpu = 0u16;
+        let mut cpus_dom = HashMap::<u16, Domain>::new();
+
+        loop {
+            let record = parse_record(&mut file, &mut last_tsc, &mut current_cpu, &mut cpus_dom);
+            match record {
+                Ok(r) => trace.records.push(r),
+                Err(e) if e.kind() != ErrorKind::Other => break,
+                Err(_) => (),
+            }
+        }
+
+        trace.cpus = cpus_dom.keys().map(|v| *v).collect()
+    } // "file" closes here
+
+    trace.records.sort_unstable();
+    Ok(trace)
 }
 
-impl Parser {
-    // PUBLIC FNs
-    pub fn new(path: &str) -> Result<Self> {
-        let mut instance = Self {
-            // Host CPUs fiels
-            cpu_current: 0,
-            cpu_domains: HashMap::new(),
-            // Records fiels
-            tsc_last: 0,
-            records: Vec::new(),
-        };
+fn read_u32(file: &mut File) -> Result<u32> {
+    let mut buf = [0u8; 4];
+    file.read_exact(&mut buf)?;
+    Ok(u32::from_ne_bytes(buf)) // host-endian because of XenTrace
+}
 
-        {
-            let path_i = Path::new(path);
-            let mut file = File::open(path_i)?;
+fn read_u64(file: &mut File) -> Result<u64> {
+    let mut buf = [0u8; 8];
+    file.read_exact(&mut buf)?;
+    Ok(u64::from_ne_bytes(buf)) // host-endian because of XenTrace
+}
 
-            loop {
-                let record = instance.read_record(&mut file);
-                match record {
-                    Ok(r) => instance.records.push(r),
-                    Err(e) if e.kind() != ErrorKind::Other => break,
-                    Err(_) => (),
-                }
-            }
-        } // File closed
+fn parse_event(file: &mut File, last_tsc: &mut u64) -> Result<Event> {
+    let hdr = read_u32(file)?;
 
-        instance.records.sort_unstable();
-        Ok(instance)
-    }
+    // Event code
+    let code = hdr & 0x0FFFFFFF;
 
-    pub fn get_records(&self) -> &Vec<Record> {
-        &self.records
-    }
+    // Event tsc
+    let tsc = {
+        let in_tsc = (hdr & (1 << 31)) > 0;
+        if in_tsc {
+            *last_tsc = read_u64(file)?;
+        }
+        *last_tsc
+    };
 
-    pub fn cpu_count(&self) -> u16 {
-        self.cpu_domains.keys().max().map(|v| v + 1).unwrap()
-    }
-
-    // PRIVATE FNs
-    fn read_u32(file: &mut File) -> Result<u32> {
-        let mut buf = [0u8; 4];
-        file.read_exact(&mut buf)?;
-        Ok(u32::from_ne_bytes(buf)) // host-endian because of XenTrace
-    }
-
-    fn read_u64(file: &mut File) -> Result<u64> {
-        let mut buf = [0u8; 8];
-        file.read_exact(&mut buf)?;
-        Ok(u64::from_ne_bytes(buf)) // host-endian because of XenTrace
-    }
-
-    fn read_event(&mut self, file: &mut File) -> Result<Event> {
-        // Read header
-        let hdr = Self::read_u32(file)?;
-        let code = hdr & 0x0FFFFFFF;
-
-        // Read TSC
-        let tsc = {
-            let in_tsc = (hdr & (1 << 31)) > 0;
-            if in_tsc {
-                self.tsc_last = Self::read_u64(file)?;
-            }
-            self.tsc_last
-        };
-
-        // Read extras
-        let extra = {
-            let n_extra = (hdr >> 28) & 7;
-            let mut extra = Vec::with_capacity(n_extra as usize);
-            for _ in 0..n_extra {
-                let val = Self::read_u32(file)?;
-                extra.push(val);
-            }
-            extra
-        };
-
-        // Create Event
-        Ok(Event::new(code, tsc, extra))
-    }
-
-    fn read_record(&mut self, file: &mut File) -> Result<Record> {
-        let event = self.read_event(file)?;
-        let code = event.get_code().into_u32();
-        let extra = event.get_extra();
-
-        let extra_0 = *extra.get(0).unwrap_or(&0);
-
-        // Handle TRC_TRACE_CPU_CHANGE event
-        if code == TRC_TRACE_CPU_CHANGE {
-            self.cpu_current = extra_0 as u16;
-            return Err(Error::from(ErrorKind::Other)); // Do not save that kind of events
+    // Event extras
+    let extra = {
+        let n_extra = (hdr >> 28) & 7;
+        let mut extra = Vec::with_capacity(n_extra as usize);
+        for _ in 0..n_extra {
+            let val = read_u32(file)?;
+            extra.push(val);
         }
 
-        // Get current domain
-        let domain = if code == (code & TRC_SCHED_TO_RUN) {
+        extra
+    };
+
+    Ok(Event {
+        code: EventCode::from_u32(code),
+        tsc,
+        extra,
+    })
+}
+
+fn parse_record(
+    file: &mut File,
+    last_tsc: &mut u64,
+    current_cpu: &mut u16,
+    cpus_dom: &mut HashMap<u16, Domain>,
+) -> Result<Record> {
+    let event = parse_event(file, last_tsc)?;
+    let code = event.code.into_u32();
+
+    if code == TRC_TRACE_CPU_CHANGE {
+        let extra_0 = *event.extra.get(0).unwrap_or(&0);
+        *current_cpu = extra_0 as u16;
+
+        return Err(Error::from(ErrorKind::Other)); // Do not save this kind of events
+    }
+
+    let domain = match code == (code & TRC_SCHED_TO_RUN) {
+        true => {
+            let extra_0 = *event.extra.get(0).unwrap_or(&0);
             let dom = Domain::from_u32(extra_0);
-            self.cpu_domains.insert(self.cpu_current, dom)
-        } else {
-            self.cpu_domains.get(&self.cpu_current).copied()
+            cpus_dom.insert(*current_cpu, dom).map(|_| dom)
         }
-        .unwrap_or_default();
-
-        // Create record
-        Ok(Record::new(self.cpu_current, domain, event))
+        false => cpus_dom.get(current_cpu).map(|d| *d),
     }
+    .unwrap_or_default();
+
+    Ok(Record {
+        cpu: *current_cpu,
+        domain,
+        event,
+    })
 }

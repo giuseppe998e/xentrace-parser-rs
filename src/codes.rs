@@ -1,0 +1,2 @@
+pub const TRC_TRACE_CPU_CHANGE: u32 = 0x0001f003;
+pub const TRC_SCHED_TO_RUN: u32 = 0x00021f0f;
