@@ -11,7 +11,7 @@ use xentrace_parser::{
 };
 
 fn main() -> std::io::Result<()> {
-    let parser = Parser::new("/path/to/trace.xen.dat")?;
+    let parser = xentrace_parse("/path/to/trace.xen.dat")?;
     let records = &trace.records;
 
     for r in records {
