@@ -1,20 +1,16 @@
 use std::{env, io::Result};
 use xentrace_parser::{
     record::{Domain, DomainType /*, Record*/, Event /*, EventCode*/},
-    xentrace_parse,
+    xentrace_parse, Trace,
 };
 
 fn main() -> Result<()> {
     let trace_file = {
         let current_dir = env::current_dir().unwrap();
-        format!(
-            "{}/{}",
-            current_dir.to_str().unwrap(),
-            "examples/trace.xen"
-        )
+        format!("{}/{}", current_dir.to_str().unwrap(), "examples/trace.xen")
     };
 
-    let trace = xentrace_parse(&trace_file)?;
+    let trace: Trace = xentrace_parse(&trace_file)?;
     let records = &trace.records;
 
     for r in records {
