@@ -107,7 +107,8 @@ fn parse_record(
         true => {
             let extra_0 = *event.extra.get(0).unwrap_or(&0);
             let dom = Domain::from_u32(extra_0);
-            cpus_dom.insert(*current_cpu, dom).map(|_| dom)
+            cpus_dom.insert(*current_cpu, dom);
+            Some(dom)
         }
         false => cpus_dom.get(current_cpu).map(|d| *d),
     }
