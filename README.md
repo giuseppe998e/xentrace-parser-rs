@@ -7,11 +7,11 @@ This is the Rust lang version of a [project](https://github.com/giuseppe998e/xen
 ```rust
 use xentrace_parser::{
     record::{Domain, DomainType /*, Record*/, Event /*, EventCode*/},
-    xentrace_parse,
+    xentrace_parse, Trace,
 };
 
 fn main() -> std::io::Result<()> {
-    let parser = xentrace_parse("/path/to/trace.xen.dat")?;
+    let parser: Trace = xentrace_parse("/path/to/trace.xen.dat")?;
     let records = &trace.records;
 
     for r in records {
