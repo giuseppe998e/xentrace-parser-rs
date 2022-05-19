@@ -14,11 +14,7 @@ impl PartialEq for Event {
     fn eq(&self, other: &Self) -> bool {
         self.code == other.code
             && self.tsc == other.tsc
-            && self
-                .extra
-                .iter()
-                .zip(other.extra.iter())
-                .all(|(a, b)| a == b)
+            && self.extra == other.extra
     }
 }
 
