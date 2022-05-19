@@ -7,7 +7,7 @@ use std::cmp::Ordering;
 pub struct Event {
     pub code: EventCode,
     pub tsc: u64,
-    pub extra: Vec<u32>,
+    pub extra: Option<Vec<u32>>,
 }
 
 impl PartialEq for Event {

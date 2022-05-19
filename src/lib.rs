@@ -74,13 +74,17 @@ fn parse_event(file: &mut File, last_tsc: &mut u64) -> Result<Event> {
     // Extra list
     let extra = {
         let n_extra = (hdr >> 28) & 7;
-        let mut extra = Vec::with_capacity(n_extra as usize);
-        for _ in 0..n_extra {
-            let val = read_u32(file)?;
-            extra.push(val);
-        }
+        if n_extra > 0 {
+            let mut extra = Vec::with_capacity(n_extra as usize);
+            for _ in 0..n_extra {
+                let val = read_u32(file)?;
+                extra.push(val);
+            }
 
-        extra
+            Some(extra)
+        } else {
+            None
+        }
     };
 
     Ok(Event {
@@ -100,7 +104,11 @@ fn parse_record(
     let code = event.code.into_u32();
 
     if code == TRC_TRACE_CPU_CHANGE {
-        let extra_0 = *event.extra.get(0).unwrap_or(&0);
+        let extra_0 = event
+            .extra
+            .as_ref()
+            .and_then(|v| v.get(0).copied())
+            .unwrap_or(0);
         *current_cpu = extra_0 as u16;
 
         return Err(Error::from(ErrorKind::Other)); // Do not save this kind of events
@@ -108,7 +116,11 @@ fn parse_record(
 
     let domain = match code == (code & TRC_SCHED_TO_RUN) {
         true => {
-            let extra_0 = *event.extra.get(0).unwrap_or(&0);
+            let extra_0 = event
+                .extra
+                .as_ref()
+                .and_then(|v| v.get(0).copied())
+                .unwrap_or(0);
             let dom = Domain::from_u32(extra_0);
             cpus_dom.insert(*current_cpu, dom);
             Some(dom)
