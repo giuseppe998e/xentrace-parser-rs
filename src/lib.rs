@@ -32,7 +32,7 @@ pub fn xentrace_parse(path: &str) -> Result<Trace> {
                 Err(e) => match e.kind() {
                     ErrorKind::Other => (),
                     _ => break,
-                }
+                },
             }
         }
 
@@ -58,19 +58,20 @@ fn read_u64(file: &mut File) -> Result<u64> {
 fn parse_event(file: &mut File, last_tsc: &mut u64) -> Result<Event> {
     let hdr = read_u32(file)?;
 
-    // Event code
+    // Code
     let code = hdr & 0x0FFFFFFF;
 
-    // Event tsc
+    // T.S.C.
     let tsc = {
         let in_tsc = (hdr & (1 << 31)) > 0;
         if in_tsc {
             *last_tsc = read_u64(file)?;
         }
+
         *last_tsc
     };
 
-    // Event extras
+    // Extra list
     let extra = {
         let n_extra = (hdr >> 28) & 7;
         let mut extra = Vec::with_capacity(n_extra as usize);
