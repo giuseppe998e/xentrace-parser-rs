@@ -3,18 +3,18 @@ pub use ecode::EventCode;
 
 use std::cmp::Ordering;
 
+pub const EVENT_EXTRA_MAXLEN: usize = 7;
+
 #[derive(Debug, Clone, Eq)]
 pub struct Event {
     pub code: EventCode,
     pub tsc: u64,
-    pub extra: Option<Vec<u32>>,
+    pub extra: [Option<u32>; EVENT_EXTRA_MAXLEN],
 }
 
 impl PartialEq for Event {
     fn eq(&self, other: &Self) -> bool {
-        self.code == other.code
-            && self.tsc == other.tsc
-            && self.extra == other.extra
+        self.code == other.code && self.tsc == other.tsc && self.extra == other.extra
     }
 }
 

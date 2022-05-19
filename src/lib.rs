@@ -2,7 +2,7 @@ pub mod codes;
 use codes::*;
 
 pub mod record;
-use record::{Domain, Event, EventCode, Record};
+use record::{Domain, Event, EventCode, Record, EVENT_EXTRA_MAXLEN};
 
 mod trace;
 pub use trace::Trace;
@@ -60,6 +60,7 @@ fn parse_event(file: &mut File, last_tsc: &mut u64) -> Result<Event> {
 
     // Code
     let code = hdr & 0x0FFFFFFF;
+    let code = EventCode::from_u32(code);
 
     // T.S.C.
     let tsc = {
@@ -73,22 +74,18 @@ fn parse_event(file: &mut File, last_tsc: &mut u64) -> Result<Event> {
 
     // Extra list
     let extra = {
-        let n_extra = (hdr >> 28) & 7;
-        if n_extra > 0 {
-            let mut extra = Vec::with_capacity(n_extra as usize);
-            for _ in 0..n_extra {
-                let val = read_u32(file)?;
-                extra.push(val);
-            }
+        let n_extra = ((hdr >> 28) as usize) & EVENT_EXTRA_MAXLEN;
+        let mut extra = [None; EVENT_EXTRA_MAXLEN];
 
-            Some(extra)
-        } else {
-            None
+        for i in 0..n_extra {
+            extra[i] = Some(read_u32(file)?)
         }
+
+        extra
     };
 
     Ok(Event {
-        code: EventCode::from_u32(code),
+        code,
         tsc,
         extra,
     })
@@ -104,11 +101,7 @@ fn parse_record(
     let code = event.code.into_u32();
 
     if code == TRC_TRACE_CPU_CHANGE {
-        let extra_0 = event
-            .extra
-            .as_ref()
-            .and_then(|v| v.get(0).copied())
-            .unwrap_or(0);
+        let extra_0 = event.extra[0].unwrap_or(0);
         *current_cpu = extra_0 as u16;
 
         return Err(Error::from(ErrorKind::Other)); // Do not save this kind of events
@@ -116,16 +109,12 @@ fn parse_record(
 
     let domain = match code == (code & TRC_SCHED_TO_RUN) {
         true => {
-            let extra_0 = event
-                .extra
-                .as_ref()
-                .and_then(|v| v.get(0).copied())
-                .unwrap_or(0);
+            let extra_0 = event.extra[0].unwrap_or(0);
             let dom = Domain::from_u32(extra_0);
             cpus_dom.insert(*current_cpu, dom);
             Some(dom)
         }
-        false => cpus_dom.get(current_cpu).map(|d| *d),
+        false => cpus_dom.get(current_cpu).cloned(),
     }
     .unwrap_or_default();
 
