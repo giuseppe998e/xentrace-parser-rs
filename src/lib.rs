@@ -29,8 +29,10 @@ pub fn xentrace_parse(path: &str) -> Result<Trace> {
             let record = parse_record(&mut file, &mut last_tsc, &mut current_cpu, &mut cpus_dom);
             match record {
                 Ok(r) => trace.records.push(r),
-                Err(e) if e.kind() != ErrorKind::Other => break,
-                Err(_) => (),
+                Err(e) => match e.kind() {
+                    ErrorKind::Other => (),
+                    _ => break,
+                }
             }
         }
 
