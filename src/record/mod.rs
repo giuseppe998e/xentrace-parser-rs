@@ -2,7 +2,7 @@ mod domain;
 mod event;
 
 pub use domain::{Domain, DomainType};
-pub use event::{Event, EventCode};
+pub use event::{Event, EventCode, EVENT_EXTRA_MAXLEN};
 
 use std::cmp::Ordering;
 
