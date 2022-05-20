@@ -36,19 +36,21 @@ pub fn xentrace_parse(path: &str) -> Result<Trace> {
             }
         }
 
-        trace.cpus = cpus_dom.keys().map(|v| *v).collect()
+        trace.cpus = cpus_dom.keys().copied().collect()
     } // "file" closes here
 
     trace.records.sort_unstable();
     Ok(trace)
 }
 
+#[inline]
 fn read_u32(file: &mut File) -> Result<u32> {
     let mut buf = [0u8; 4];
     file.read_exact(&mut buf)?;
     Ok(u32::from_ne_bytes(buf)) // host-endian because of XenTrace
 }
 
+#[inline(always)]
 fn read_u64(file: &mut File) -> Result<u64> {
     let mut buf = [0u8; 8];
     file.read_exact(&mut buf)?;
@@ -84,11 +86,7 @@ fn parse_event(file: &mut File, last_tsc: &mut u64) -> Result<Event> {
         extra
     };
 
-    Ok(Event {
-        code,
-        tsc,
-        extra,
-    })
+    Ok(Event { code, tsc, extra })
 }
 
 fn parse_record(
@@ -101,9 +99,7 @@ fn parse_record(
     let code = event.code.into_u32();
 
     if code == TRC_TRACE_CPU_CHANGE {
-        let extra_0 = event.extra[0].unwrap_or(0);
-        *current_cpu = extra_0 as u16;
-
+        *current_cpu = event.extra[0].unwrap_or(0) as u16;
         return Err(Error::from(ErrorKind::Other)); // Do not save this kind of events
     }
 
@@ -114,7 +110,7 @@ fn parse_record(
             cpus_dom.insert(*current_cpu, dom);
             Some(dom)
         }
-        false => cpus_dom.get(current_cpu).cloned(),
+        false => cpus_dom.get(current_cpu).copied(),
     }
     .unwrap_or_default();
 
