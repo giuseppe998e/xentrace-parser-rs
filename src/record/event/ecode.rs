@@ -38,3 +38,15 @@ impl PartialEq for EventCode {
         self.code == other.code
     }
 }
+
+impl From<u32> for EventCode {
+    fn from(val: u32) -> Self {
+        EventCode::from_u32(val)
+    }
+}
+
+impl Into<u32> for EventCode {
+    fn into(self) -> u32 {
+        self.into_u32()
+    }
+}

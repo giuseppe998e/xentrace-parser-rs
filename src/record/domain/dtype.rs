@@ -7,7 +7,7 @@ pub enum DomainType {
 }
 
 impl DomainType {
-    pub fn from_id(val: u16) -> Self {
+    pub fn from_u16(val: u16) -> Self {
         match val {
             0 => Self::Zero,
             32767 => Self::Idle,
@@ -16,7 +16,7 @@ impl DomainType {
         }
     }
 
-    pub fn into_id(&self) -> u16 {
+    pub fn into_u16(&self) -> u16 {
         match self {
             Self::Zero => 0,
             Self::Idle => 32767,
@@ -29,5 +29,17 @@ impl DomainType {
 impl Default for DomainType {
     fn default() -> Self {
         DomainType::Default
+    }
+}
+
+impl From<u16> for DomainType {
+    fn from(v: u16) -> Self {
+        DomainType::from_u16(v)
+    }
+}
+
+impl Into<u16> for DomainType {
+    fn into(self) -> u16 {
+        self.into_u16()
     }
 }
