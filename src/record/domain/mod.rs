@@ -38,6 +38,46 @@ impl Into<u32> for Domain {
     }
 }
 
+impl Into<u64> for Domain {
+    fn into(self) -> u64 {
+        u64::from(self.into_u32())
+    }
+}
+
+impl Into<i64> for Domain {
+    fn into(self) -> i64 {
+        i64::from(self.into_u32())
+    }
+}
+
+impl Into<u128> for Domain {
+    fn into(self) -> u128 {
+        u128::from(self.into_u32())
+    }
+}
+
+impl Into<i128> for Domain {
+    fn into(self) -> i128 {
+        i128::from(self.into_u32())
+    }
+}
+
+impl TryInto<usize> for Domain {
+    type Error = std::num::TryFromIntError;
+
+    fn try_into(self) -> std::result::Result<usize, Self::Error> {
+        usize::try_from(self.into_u32())
+    }
+}
+
+impl TryInto<isize> for Domain {
+    type Error = std::num::TryFromIntError;
+
+    fn try_into(self) -> std::result::Result<isize, Self::Error> {
+        isize::try_from(self.into_u32())
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::Domain;
