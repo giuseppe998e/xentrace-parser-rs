@@ -38,3 +38,43 @@ impl PartialEq for EventCode {
         self.code == other.code
     }
 }
+
+impl From<u32> for EventCode {
+    fn from(val: u32) -> Self {
+        EventCode::from_u32(val)
+    }
+}
+
+impl Into<u32> for EventCode {
+    fn into(self) -> u32 {
+        self.into_u32()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::EventCode;
+
+    #[test]
+    fn equality_test() {
+        let ecode1 = EventCode::from(0x00015003);
+        let ecode2 = EventCode::from_u32(0x00015003);
+
+        assert_eq!(ecode1, ecode2);
+        assert_eq!(ecode1.main, ecode2.main);
+        assert_eq!(ecode1.sub, ecode2.sub);
+        assert_eq!(ecode1.minor, ecode2.minor);
+    }
+
+    #[test]
+    fn not_full_equality_test() {
+        let ecode1 = EventCode::from_u32(0x00015003);
+        let ecode2 = EventCode::from(0x01015003);
+
+        assert_ne!(ecode1, ecode2);
+        assert_ne!(ecode1.main, ecode2.main);
+        
+        assert_eq!(ecode1.sub, ecode2.sub);
+        assert_eq!(ecode1.minor, ecode2.minor);
+    }
+}
