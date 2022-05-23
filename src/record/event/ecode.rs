@@ -45,33 +45,33 @@ impl From<u32> for EventCode {
     }
 }
 
-impl Into<u32> for EventCode {
-    fn into(self) -> u32 {
-        self.into_u32()
+impl From<EventCode> for u32 {
+    fn from(val: EventCode) -> Self {
+        val.into_u32()
     }
 }
 
-impl Into<u64> for EventCode {
-    fn into(self) -> u64 {
-        u64::from(self.into_u32())
+impl From<EventCode> for u64 {
+    fn from(val: EventCode) -> Self {
+        u64::from(val.into_u32())
     }
 }
 
-impl Into<i64> for EventCode {
-    fn into(self) -> i64 {
-        i64::from(self.into_u32())
+impl From<EventCode> for i64 {
+    fn from(val: EventCode) -> Self {
+        i64::from(val.into_u32())
     }
 }
 
-impl Into<u128> for EventCode {
-    fn into(self) -> u128 {
-        u128::from(self.into_u32())
+impl From<EventCode> for u128 {
+    fn from(val: EventCode) -> Self {
+        u128::from(val.into_u32())
     }
 }
 
-impl Into<i128> for EventCode {
-    fn into(self) -> i128 {
-        i128::from(self.into_u32())
+impl From<EventCode> for i128 {
+    fn from(val: EventCode) -> Self {
+        i128::from(val.into_u32())
     }
 }
 

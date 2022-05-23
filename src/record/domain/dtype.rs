@@ -38,51 +38,51 @@ impl From<u16> for DomainType {
     }
 }
 
-impl Into<u16> for DomainType {
-    fn into(self) -> u16 {
-        self.into_u16()
+impl From<DomainType> for u16 {
+    fn from(val: DomainType) -> Self {
+        val.into_u16()
     }
 }
 
-impl Into<u32> for DomainType {
-    fn into(self) -> u32 {
-        u32::from(self.into_u16())
+impl From<DomainType> for u32 {
+    fn from(val: DomainType) -> Self {
+        u32::from(val.into_u16())
     }
 }
 
-impl Into<i32> for DomainType {
-    fn into(self) -> i32 {
-        i32::from(self.into_u16())
+impl From<DomainType> for i32 {
+    fn from(val: DomainType) -> Self {
+        i32::from(val.into_u16())
     }
 }
 
-impl Into<u64> for DomainType {
-    fn into(self) -> u64 {
-        u64::from(self.into_u16())
+impl From<DomainType> for u64 {
+    fn from(val: DomainType) -> Self {
+        u64::from(val.into_u16())
     }
 }
 
-impl Into<i64> for DomainType {
-    fn into(self) -> i64 {
-        i64::from(self.into_u16())
+impl From<DomainType> for i64 {
+    fn from(val: DomainType) -> Self {
+        i64::from(val.into_u16())
     }
 }
 
-impl Into<u128> for DomainType {
-    fn into(self) -> u128 {
-        u128::from(self.into_u16())
+impl From<DomainType> for u128 {
+    fn from(val: DomainType) -> Self {
+        u128::from(val.into_u16())
     }
 }
 
-impl Into<i128> for DomainType {
-    fn into(self) -> i128 {
-        i128::from(self.into_u16())
+impl From<DomainType> for i128 {
+    fn from(val: DomainType) -> Self {
+        i128::from(val.into_u16())
     }
 }
 
-impl Into<usize> for DomainType {
-    fn into(self) -> usize {
-        usize::from(self.into_u16())
+impl From<DomainType> for usize {
+    fn from(val: DomainType) -> Self {
+        usize::from(val.into_u16())
     }
 }
 
