@@ -40,7 +40,8 @@ pub fn xentrace_parse(path: &str) -> Result<Trace> {
         cpus = cpus_dom.keys().copied().collect()
     } // "file" closes here
 
-    records.sort_unstable();
+    records.sort();
+
     Ok(Trace {
         records: records.into_boxed_slice(),
         cpus: cpus.into_boxed_slice(),
