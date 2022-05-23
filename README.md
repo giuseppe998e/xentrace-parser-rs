@@ -6,15 +6,15 @@ This is the Rust lang version of a [project](https://github.com/giuseppe998e/xen
 ## Usage
 ```rust
 use xentrace_parser::{
-    record::{Domain, DomainType /*, Record*/, Event /*, EventCode*/},
+    record::{Domain, DomainType, Record, Event /*, EventCode*/},
     xentrace_parse, Trace,
 };
 
-fn main() -> std::io::Result<()> {
-    let parser: Trace = xentrace_parse("/path/to/trace.xen.dat")?;
-    let records = &trace.records;
+fn main() -> Result<()> {
+    let trace: Trace = xentrace_parse("/path/to/trace.xen.dat")?;
+    let records: &Box<[Record]> = &trace.records;
 
-    for r in records {
+    for r in records.iter() {
         let _cpu: u16 = r.cpu; // Host CPU
         let domain: Domain = r.domain;
         let _dom_type: DomainType = domain.type_;
@@ -25,8 +25,8 @@ fn main() -> std::io::Result<()> {
 
     println!(); // Blank
 
-    let rec_count = records.len();
-    let cpu_count = trace.cpu_count();
+    let rec_count: usize = records.len();
+    let cpu_count:u16 = trace.cpu_count();
 
     println!("Records count: {:?}", rec_count);
     println!("Host CPU count:  {:?}", cpu_count);

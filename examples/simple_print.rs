@@ -13,7 +13,7 @@ fn main() -> Result<()> {
     let trace: Trace = xentrace_parse(&trace_file)?;
     let records = &trace.records;
 
-    for r in records {
+    for r in records.iter() {
         let _cpu: u16 = r.cpu; // Host CPU
         let domain: Domain = r.domain;
         let _dom_type: DomainType = domain.type_;
