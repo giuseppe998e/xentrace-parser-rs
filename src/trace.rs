@@ -11,3 +11,15 @@ impl Trace {
         self.cpus.iter().max().map(|v| v + 1).unwrap()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::Trace;
+
+    #[test]
+    fn cpu_count_test() {
+        let trace = Trace { records: vec![], cpus: vec![1,5,6,7,2,3,8,4] };
+
+        assert_eq!(trace.cpu_count(), 9);
+    }
+}

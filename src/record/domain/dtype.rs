@@ -43,3 +43,31 @@ impl Into<u16> for DomainType {
         self.into_u16()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::DomainType;
+
+    #[test]
+    fn into_u16_test() {
+        let type_ = DomainType::Guest(12345);
+        
+        assert_eq!(type_.into_u16(), 12345);
+    }
+
+    #[test]
+    fn equality_test() {
+        let type1 = DomainType::from_u16(55);
+        let type2 = DomainType::from(55);
+
+        assert_eq!(type1, type2);
+    }
+
+    #[test]
+    fn not_equality_test() {
+        let type1 = DomainType::from(0);
+        let type2 = DomainType::Default;
+
+        assert_ne!(type1.into_u16(), type2.into());
+    }
+}
