@@ -32,33 +32,33 @@ impl From<u32> for Domain {
     }
 }
 
-impl Into<u32> for Domain {
-    fn into(self) -> u32 {
-        self.into_u32()
+impl From<Domain> for u32 {
+    fn from(val: Domain) -> Self {
+        val.into_u32()
     }
 }
 
-impl Into<u64> for Domain {
-    fn into(self) -> u64 {
-        u64::from(self.into_u32())
+impl From<Domain> for u64 {
+    fn from(val: Domain) -> Self {
+        u64::from(val.into_u32())
     }
 }
 
-impl Into<i64> for Domain {
-    fn into(self) -> i64 {
-        i64::from(self.into_u32())
+impl From<Domain> for i64 {
+    fn from(val: Domain) -> Self {
+        i64::from(val.into_u32())
     }
 }
 
-impl Into<u128> for Domain {
-    fn into(self) -> u128 {
-        u128::from(self.into_u32())
+impl From<Domain> for u128 {
+    fn from(val: Domain) -> Self {
+        u128::from(val.into_u32())
     }
 }
 
-impl Into<i128> for Domain {
-    fn into(self) -> i128 {
-        i128::from(self.into_u32())
+impl From<Domain> for i128 {
+    fn from(val: Domain) -> Self {
+        i128::from(val.into_u32())
     }
 }
 

@@ -15,7 +15,8 @@ use std::{
 };
 
 pub fn xentrace_parse(path: &str) -> Result<Trace> {
-    let mut trace = Trace::default();
+    let mut records = Vec::<Record>::new();
+    let cpus: Vec<u16>;
 
     {
         let path_i = Path::new(path);
@@ -28,7 +29,7 @@ pub fn xentrace_parse(path: &str) -> Result<Trace> {
         loop {
             let record = parse_record(&mut file, &mut last_tsc, &mut current_cpu, &mut cpus_dom);
             match record {
-                Ok(r) => trace.records.push(r),
+                Ok(r) => records.push(r),
                 Err(e) => match e.kind() {
                     ErrorKind::Other => (),
                     _ => break,
@@ -36,11 +37,14 @@ pub fn xentrace_parse(path: &str) -> Result<Trace> {
             }
         }
 
-        trace.cpus = cpus_dom.keys().copied().collect()
+        cpus = cpus_dom.keys().copied().collect()
     } // "file" closes here
 
-    trace.records.sort_unstable();
-    Ok(trace)
+    records.sort_unstable();
+    Ok(Trace {
+        records: records.into_boxed_slice(),
+        cpus: cpus.into_boxed_slice(),
+    })
 }
 
 #[inline]
@@ -50,7 +54,7 @@ fn read_u32(file: &mut File) -> Result<u32> {
     Ok(u32::from_ne_bytes(buf)) // host-endian because of XenTrace
 }
 
-#[inline(always)]
+#[inline]
 fn read_u64(file: &mut File) -> Result<u64> {
     let mut buf = [0u8; 8];
     file.read_exact(&mut buf)?;
@@ -79,8 +83,10 @@ fn parse_event(file: &mut File, last_tsc: &mut u64) -> Result<Event> {
         let n_extra = ((hdr >> 28) as usize) & EVENT_EXTRA_MAXLEN;
         let mut extra = [None; EVENT_EXTRA_MAXLEN];
 
-        for i in 0..n_extra {
-            extra[i] = Some(read_u32(file)?)
+        if n_extra > 0 {
+            for e in extra.iter_mut().take(n_extra) {
+                *e = Some(read_u32(file)?)
+            }
         }
 
         extra
