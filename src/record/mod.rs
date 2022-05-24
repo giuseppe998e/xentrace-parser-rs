@@ -1,15 +1,19 @@
 mod domain;
-mod event;
-
 pub use domain::{Domain, DomainType};
+
+mod event;
 pub use event::{Event, EventCode, EVENT_EXTRA_MAXLEN};
 
 use std::cmp::Ordering;
 
+/// Contains information from a single record of the parsed XenTrace binary file.
 #[derive(Clone, Eq, Debug)]
 pub struct Record {
+    /// The processor number (of the host) on which the [`Event`](event::Event) occurred.
     pub cpu: u16,
+    /// The [`Domain`](domain::Domain) on which the [`Event`](event::Event) occurred.
     pub domain: Domain,
+    /// The information of the [`Event`](event::Event) of this record.
     pub event: Event,
 }
 

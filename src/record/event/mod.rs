@@ -3,12 +3,18 @@ pub use ecode::EventCode;
 
 use std::cmp::Ordering;
 
+/// Maximum value of an event's list of additional information.
 pub const EVENT_EXTRA_MAXLEN: usize = 7;
 
+/// Contains the information of a single event. 
+/// It is a sub-structure of [`Record`](super::Record).
 #[derive(Debug, Clone, Eq)]
 pub struct Event {
+    /// The [code](ecode::EventCode) of the event.
     pub code: EventCode,
+    /// The timestamp of the event (the value of the CPU cycle counter).
     pub tsc: u64,
+    /// The list of additional event information (maximum [`EVENT_EXTRA_MAXLEN`](super::EVENT_EXTRA_MAXLEN) items).
     pub extra: [Option<u32>; EVENT_EXTRA_MAXLEN],
 }
 

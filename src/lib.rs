@@ -14,6 +14,36 @@ use std::{
     path::Path,
 };
 
+/// Returns the [Trace](trace::Trace) structure, enclosed in an [std::io:Result](std::io::Result),
+/// containing the XenTrace binary file records parsed.
+///
+/// Records are sorted according to their `tsc` value.
+///
+/// # Examples
+///
+/// ```
+/// use std::io::Result;
+/// use xentrace_parser::{xentrace_parse, Trace};
+///
+/// fn function() -> Result<()> {
+///     let trace: Trace = xentrace_parse("/path/to/trace.xen.dat")?;
+///     let records = &trace.records;
+///
+///     for r in records.iter() {
+///         println!("{:?}", r);
+///     }
+///
+///     println!(); // Blank
+///
+///     let rec_count = records.len();
+///     let cpu_count = trace.cpu_count();
+///
+///     println!("Records count: {:?}", rec_count);
+///     println!("Host CPU count:  {:?}", cpu_count);
+///
+///     Ok(())
+/// }
+/// ```
 pub fn xentrace_parse(file: &str) -> Result<Trace> {
     let mut records = Vec::<Record>::new();
     let cpus: Vec<u16>;

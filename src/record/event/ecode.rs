@@ -1,10 +1,14 @@
 use std::fmt::{Debug, Formatter, Result};
 
+/// Contains the event code read as a 32-bit unsigned big-endian integer.
 #[derive(Clone, Copy, Eq)]
 pub struct EventCode {
     code: u32,
+    /// Class, can be used to filter events.
     pub main: u16,
+    /// Subclass, can also be used to filter events.
     pub sub: u8,
+    /// Minor, identifies the event in its class and subclass.
     pub minor: u16,
 }
 
