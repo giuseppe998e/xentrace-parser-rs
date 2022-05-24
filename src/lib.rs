@@ -103,7 +103,7 @@ fn parse_record(
     cpus_dom: &mut HashMap<u16, Domain>,
 ) -> Result<Record> {
     let event = parse_event(file, last_tsc)?;
-    let code = event.code.into_u32();
+    let code = u32::from(event.code);
 
     if code == TRC_TRACE_CPU_CHANGE {
         *current_cpu = event.extra[0].unwrap_or(0) as u16;

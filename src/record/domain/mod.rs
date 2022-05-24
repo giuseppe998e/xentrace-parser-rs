@@ -7,58 +7,48 @@ pub struct Domain {
     pub vcpu: u16,
 }
 
-impl Domain {
-    pub fn from_u32(val: u32) -> Self {
+impl From<u32> for Domain {
+    fn from(val: u32) -> Self {
         let vcpu = (val & 0x0000FFFF) as u16;
         let type_ = {
             let id = (val >> 16) as u16;
-            DomainType::from_u16(id)
+            DomainType::from(id)
         };
 
         Self { type_, vcpu }
-    }
-
-    pub fn into_u32(&self) -> u32 {
-        let type_u32 = self.type_.into_u16() as u32;
-        let vcpu_u32 = self.vcpu as u32;
-
-        (type_u32 << 16) | vcpu_u32
-    }
-}
-
-impl From<u32> for Domain {
-    fn from(val: u32) -> Self {
-        Domain::from_u32(val)
     }
 }
 
 impl From<Domain> for u32 {
     fn from(val: Domain) -> Self {
-        val.into_u32()
+        let type_u32 = u32::from(val.type_);
+        let vcpu_u32 = val.vcpu as u32;
+
+        (type_u32 << 16) | vcpu_u32
     }
 }
 
 impl From<Domain> for u64 {
     fn from(val: Domain) -> Self {
-        u64::from(val.into_u32())
+        u64::from(u32::from(val))
     }
 }
 
 impl From<Domain> for i64 {
     fn from(val: Domain) -> Self {
-        i64::from(val.into_u32())
+        i64::from(u32::from(val))
     }
 }
 
 impl From<Domain> for u128 {
     fn from(val: Domain) -> Self {
-        u128::from(val.into_u32())
+        u128::from(u32::from(val))
     }
 }
 
 impl From<Domain> for i128 {
     fn from(val: Domain) -> Self {
-        i128::from(val.into_u32())
+        i128::from(u32::from(val))
     }
 }
 
@@ -85,7 +75,7 @@ mod tests {
     #[test]
     fn equality_test() {
         let dom1 = Domain::from(0x00015003);
-        let dom2 = Domain::from_u32(0x00015003);
+        let dom2 = Domain::from(0x00015003);
 
         assert_eq!(dom1, dom2);
         assert_eq!(dom1.type_, dom2.type_);
@@ -94,7 +84,7 @@ mod tests {
 
     #[test]
     fn not_equality_test() {
-        let dom1 = Domain::from_u32(0x00015003);
+        let dom1 = Domain::from(0x00015003);
         let dom2 = Domain::from(0x00015103);
 
         assert_ne!(u32::from(dom1), dom2.into());
