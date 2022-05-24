@@ -34,10 +34,10 @@ pub fn xentrace_parse(path: &str) -> Result<Trace> {
                     ErrorKind::Other => (),
                     _ => break,
                 },
-            }
+            };
         }
 
-        cpus = cpus_dom.keys().copied().collect()
+        cpus = cpus_dom.keys().copied().collect();
     } // "file" closes here
 
     records.sort();
