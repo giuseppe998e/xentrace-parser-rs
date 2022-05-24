@@ -1,8 +1,14 @@
 #[derive(Clone, Copy, Debug, Eq, Ord, PartialEq, PartialOrd)]
+
+/// Type of virtual machine.
 pub enum DomainType {
+    /// The zero/host domain (*The one that has access to hardware*).
     Zero,
+    /// The idle domain (*The host CPU is not used*).
     Idle,
+    /// The default domain (*No information is available*).
     Default,
+    /// The unprivileged domain (*The "real" running VMs*).
     Guest(u16),
 }
 

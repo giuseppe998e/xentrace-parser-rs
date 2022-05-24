@@ -1,9 +1,12 @@
 mod dtype;
 pub use dtype::DomainType;
 
+/// Contains the domain information of the [`Record`](super::Record).
 #[derive(Clone, Copy, Debug, Default, Eq, Ord, PartialEq, PartialOrd)]
 pub struct Domain {
+    /// The [type](dtype::DomainType) of virtual machine.
     pub type_: DomainType,
+    /// The virtual processor number.
     pub vcpu: u16,
 }
 
