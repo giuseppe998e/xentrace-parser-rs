@@ -86,11 +86,11 @@ impl From<DomainType> for usize {
     }
 }
 
-impl TryInto<isize> for DomainType {
+impl TryFrom<DomainType> for isize {
     type Error = std::num::TryFromIntError;
 
-    fn try_into(self) -> std::result::Result<isize, Self::Error> {
-        isize::try_from(self.into_u16())
+    fn try_from(value: DomainType) -> Result<Self, Self::Error> {
+        isize::try_from(u16::from(value))
     }
 }
 
@@ -102,7 +102,7 @@ mod tests {
     fn into_u16_test() {
         let type_ = DomainType::Guest(12345);
 
-        assert_eq!(type_.into_u16(), 12345);
+        assert_eq!(u16::from(type_), 12345);
     }
 
     #[test]
@@ -118,6 +118,6 @@ mod tests {
         let type1 = DomainType::from(0);
         let type2 = DomainType::Default;
 
-        assert_ne!(type1.into_u16(), type2.into());
+        assert_ne!(u16::from(type1), type2.into());
     }
 }

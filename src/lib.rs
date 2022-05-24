@@ -14,13 +14,13 @@ use std::{
     path::Path,
 };
 
-pub fn xentrace_parse(path: &str) -> Result<Trace> {
+pub fn xentrace_parse(file: &str) -> Result<Trace> {
     let mut records = Vec::<Record>::new();
     let cpus: Vec<u16>;
 
     {
-        let path_i = Path::new(path);
-        let mut file = File::open(path_i)?;
+        let path = Path::new(file);
+        let mut file = File::open(path)?;
 
         let mut last_tsc = 0u64;
         let mut current_cpu = 0u16;
@@ -34,10 +34,10 @@ pub fn xentrace_parse(path: &str) -> Result<Trace> {
                     ErrorKind::Other => (),
                     _ => break,
                 },
-            }
+            };
         }
 
-        cpus = cpus_dom.keys().copied().collect()
+        cpus = cpus_dom.keys().copied().collect();
     } // "file" closes here
 
     records.sort();
@@ -86,7 +86,7 @@ fn parse_event(file: &mut File, last_tsc: &mut u64) -> Result<Event> {
 
         if n_extra > 0 {
             for e in extra.iter_mut().take(n_extra) {
-                *e = Some(read_u32(file)?)
+                *e = Some(read_u32(file)?);
             }
         }
 

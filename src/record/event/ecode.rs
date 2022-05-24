@@ -75,19 +75,19 @@ impl From<EventCode> for i128 {
     }
 }
 
-impl TryInto<usize> for EventCode {
+impl TryFrom<EventCode> for usize {
     type Error = std::num::TryFromIntError;
 
-    fn try_into(self) -> std::result::Result<usize, Self::Error> {
-        usize::try_from(self.into_u32())
+    fn try_from(value: EventCode) -> std::result::Result<Self, Self::Error> {
+        usize::try_from(u32::from(value))
     }
 }
 
-impl TryInto<isize> for EventCode {
+impl TryFrom<EventCode> for isize {
     type Error = std::num::TryFromIntError;
 
-    fn try_into(self) -> std::result::Result<isize, Self::Error> {
-        isize::try_from(self.into_u32())
+    fn try_from(value: EventCode) -> std::result::Result<Self, Self::Error> {
+        isize::try_from(u32::from(value))
     }
 }
 
