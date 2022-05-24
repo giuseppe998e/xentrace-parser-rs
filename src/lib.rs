@@ -67,7 +67,7 @@ fn parse_event(file: &mut File, last_tsc: &mut u64) -> Result<Event> {
 
     // Code
     let code = hdr & 0x0FFFFFFF;
-    let code = EventCode::from_u32(code);
+    let code = EventCode::from(code);
 
     // T.S.C.
     let tsc = {
@@ -113,7 +113,7 @@ fn parse_record(
     let domain = match code == (code & TRC_SCHED_TO_RUN) {
         true => {
             let extra_0 = event.extra[0].unwrap_or(0);
-            let dom = Domain::from_u32(extra_0);
+            let dom = Domain::from(extra_0);
             cpus_dom.insert(*current_cpu, dom);
             Some(dom)
         }
