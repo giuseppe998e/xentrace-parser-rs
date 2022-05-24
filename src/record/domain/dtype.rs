@@ -86,11 +86,11 @@ impl From<DomainType> for usize {
     }
 }
 
-impl TryInto<isize> for DomainType {
+impl TryFrom<DomainType> for isize {
     type Error = std::num::TryFromIntError;
 
-    fn try_into(self) -> std::result::Result<isize, Self::Error> {
-        isize::try_from(self.into_u16())
+    fn try_from(value: DomainType) -> Result<Self, Self::Error> {
+        isize::try_from(u16::from(value))
     }
 }
 
