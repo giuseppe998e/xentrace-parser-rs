@@ -6,7 +6,7 @@ use std::cmp::Ordering;
 /// Maximum value of an event's list of additional information.
 pub const EVENT_EXTRA_MAXLEN: usize = 7;
 
-/// Contains the information of a single event. 
+/// Contains the information of a single event.
 /// It is a sub-structure of [`Record`](super::Record).
 #[derive(Debug, Clone, Eq)]
 pub struct Event {
