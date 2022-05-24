@@ -86,7 +86,7 @@ fn parse_event(file: &mut File, last_tsc: &mut u64) -> Result<Event> {
 
         if n_extra > 0 {
             for e in extra.iter_mut().take(n_extra) {
-                *e = Some(read_u32(file)?)
+                *e = Some(read_u32(file)?);
             }
         }
 
