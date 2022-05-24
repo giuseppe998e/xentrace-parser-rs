@@ -102,7 +102,7 @@ mod tests {
     fn into_u16_test() {
         let type_ = DomainType::Guest(12345);
 
-        assert_eq!(type_.into_u16(), 12345);
+        assert_eq!(u16::from(type_), 12345);
     }
 
     #[test]
