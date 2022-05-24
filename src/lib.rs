@@ -14,13 +14,13 @@ use std::{
     path::Path,
 };
 
-pub fn xentrace_parse(path: &str) -> Result<Trace> {
+pub fn xentrace_parse(file: &str) -> Result<Trace> {
     let mut records = Vec::<Record>::new();
     let cpus: Vec<u16>;
 
     {
-        let path_i = Path::new(path);
-        let mut file = File::open(path_i)?;
+        let path = Path::new(file);
+        let mut file = File::open(path)?;
 
         let mut last_tsc = 0u64;
         let mut current_cpu = 0u16;
