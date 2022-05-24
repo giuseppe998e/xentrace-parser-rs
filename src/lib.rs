@@ -46,9 +46,7 @@ use std::{
 /// ```
 pub fn xentrace_parse(file: &str) -> Result<Trace> {
     let mut records = Vec::<Record>::new();
-    let cpus: Vec<u16>;
-
-    {
+    let cpu_count: u16 = {
         let path = Path::new(file);
         let mut file = File::open(path)?;
 
@@ -67,14 +65,14 @@ pub fn xentrace_parse(file: &str) -> Result<Trace> {
             };
         }
 
-        cpus = cpus_dom.keys().copied().collect();
-    } // "file" closes here
+        cpus_dom.keys().max().map(|&v| v + 1).unwrap_or(0)
+    }; // "file" closes here
 
     records.sort();
 
     Ok(Trace {
         records: records.into_boxed_slice(),
-        cpus: cpus.into_boxed_slice(),
+        cpu_count,
     })
 }
 
