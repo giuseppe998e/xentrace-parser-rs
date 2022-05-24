@@ -70,10 +70,7 @@ pub fn xentrace_parse(file: &str) -> Result<Trace> {
 
     records.sort();
 
-    Ok(Trace {
-        records: records.into_boxed_slice(),
-        cpu_count,
-    })
+    Ok(Trace(records.into_boxed_slice(), cpu_count))
 }
 
 #[inline]
