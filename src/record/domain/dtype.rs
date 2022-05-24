@@ -118,6 +118,6 @@ mod tests {
         let type1 = DomainType::from(0);
         let type2 = DomainType::Default;
 
-        assert_ne!(type1.into_u16(), type2.into());
+        assert_ne!(u16::from(type1), type2.into());
     }
 }

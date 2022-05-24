@@ -97,7 +97,7 @@ mod tests {
         let dom1 = Domain::from_u32(0x00015003);
         let dom2 = Domain::from(0x00015103);
 
-        assert_ne!(dom1.into_u32(), dom2.into());
+        assert_ne!(u32::from(dom1), dom2.into());
         assert_ne!(dom1.vcpu, dom2.vcpu);
 
         assert_eq!(dom1.type_, dom2.type_);
