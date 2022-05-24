@@ -1,6 +1,6 @@
 [package]
 name = "xentrace-parser"
-version = "0.7.4"
+version = "0.8.0"
 authors = ["Giuseppe Eletto <peppe.eletto@gmail.com>"]
 description = "A XenTrace files parser with a study purpose"
 readme = "README.md"
