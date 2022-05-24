@@ -67,7 +67,7 @@ fn parse_event(file: &mut File, last_tsc: &mut u64) -> Result<Event> {
 
     // Code
     let code = hdr & 0x0FFFFFFF;
-    let code = EventCode::from_u32(code);
+    let code = EventCode::from(code);
 
     // T.S.C.
     let tsc = {
@@ -103,7 +103,7 @@ fn parse_record(
     cpus_dom: &mut HashMap<u16, Domain>,
 ) -> Result<Record> {
     let event = parse_event(file, last_tsc)?;
-    let code = event.code.into_u32();
+    let code = u32::from(event.code);
 
     if code == TRC_TRACE_CPU_CHANGE {
         *current_cpu = event.extra[0].unwrap_or(0) as u16;
@@ -113,7 +113,7 @@ fn parse_record(
     let domain = match code == (code & TRC_SCHED_TO_RUN) {
         true => {
             let extra_0 = event.extra[0].unwrap_or(0);
-            let dom = Domain::from_u32(extra_0);
+            let dom = Domain::from(extra_0);
             cpus_dom.insert(*current_cpu, dom);
             Some(dom)
         }

@@ -8,21 +8,6 @@ pub struct EventCode {
     pub minor: u16,
 }
 
-impl EventCode {
-    pub fn from_u32(val: u32) -> Self {
-        Self {
-            code: val,
-            main: ((val & 0x0FFF0000) >> 16) as u16,
-            sub: ((val & 0x0000F000) >> 12) as u8,
-            minor: (val & 0x00000FFF) as u16,
-        }
-    }
-
-    pub fn into_u32(&self) -> u32 {
-        self.code
-    }
-}
-
 impl Debug for EventCode {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
         write!(
@@ -41,37 +26,42 @@ impl PartialEq for EventCode {
 
 impl From<u32> for EventCode {
     fn from(val: u32) -> Self {
-        EventCode::from_u32(val)
+        Self {
+            code: val,
+            main: ((val & 0x0FFF0000) >> 16) as u16,
+            sub: ((val & 0x0000F000) >> 12) as u8,
+            minor: (val & 0x00000FFF) as u16,
+        }
     }
 }
 
 impl From<EventCode> for u32 {
     fn from(val: EventCode) -> Self {
-        val.into_u32()
+        val.code
     }
 }
 
 impl From<EventCode> for u64 {
     fn from(val: EventCode) -> Self {
-        u64::from(val.into_u32())
+        u64::from(u32::from(val))
     }
 }
 
 impl From<EventCode> for i64 {
     fn from(val: EventCode) -> Self {
-        i64::from(val.into_u32())
+        i64::from(u32::from(val))
     }
 }
 
 impl From<EventCode> for u128 {
     fn from(val: EventCode) -> Self {
-        u128::from(val.into_u32())
+        u128::from(u32::from(val))
     }
 }
 
 impl From<EventCode> for i128 {
     fn from(val: EventCode) -> Self {
-        i128::from(val.into_u32())
+        i128::from(u32::from(val))
     }
 }
 
@@ -98,7 +88,7 @@ mod tests {
     #[test]
     fn equality_test() {
         let ecode1 = EventCode::from(0x00015003);
-        let ecode2 = EventCode::from_u32(0x00015003);
+        let ecode2 = EventCode::from(0x00015003);
 
         assert_eq!(ecode1, ecode2);
         assert_eq!(ecode1.main, ecode2.main);
@@ -108,7 +98,7 @@ mod tests {
 
     #[test]
     fn not_full_equality_test() {
-        let ecode1 = EventCode::from_u32(0x00015003);
+        let ecode1 = EventCode::from(0x00015003);
         let ecode2 = EventCode::from(0x01015003);
 
         assert_ne!(ecode1, ecode2);
