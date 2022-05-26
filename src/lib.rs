@@ -27,19 +27,6 @@ use std::{
 ///
 /// fn function() -> Result<()> {
 ///     let trace: Trace = xentrace_parse("/path/to/trace.xen.dat")?;
-///     let records = &trace.records;
-///
-///     for r in records.iter() {
-///         println!("{:?}", r);
-///     }
-///
-///     println!(); // Blank
-///
-///     let rec_count = records.len();
-///     let cpu_count = trace.cpu_count();
-///
-///     println!("Records count: {:?}", rec_count);
-///     println!("Host CPU count:  {:?}", cpu_count);
 ///
 ///     Ok(())
 /// }
