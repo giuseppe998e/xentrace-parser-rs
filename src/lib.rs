@@ -1,3 +1,10 @@
+use std::{
+    collections::HashMap,
+    fs::File,
+    io::{Error, ErrorKind, Result},
+    path::Path,
+};
+
 pub mod codes;
 use codes::*;
 
@@ -7,12 +14,8 @@ use record::{Domain, Event, EventCode, Record, EVENT_EXTRA_MAXLEN};
 mod trace;
 pub use trace::Trace;
 
-use std::{
-    collections::HashMap,
-    fs::File,
-    io::{Error, ErrorKind, Read, Result},
-    path::Path,
-};
+mod util;
+use util::{read_u32, read_u64};
 
 /// Returns the [Trace](trace::Trace) structure, enclosed in an [std::io:Result](std::io::Result),
 /// containing the XenTrace binary file records parsed.
@@ -58,20 +61,6 @@ pub fn xentrace_parse(file: &str) -> Result<Trace> {
     records.sort();
 
     Ok(Trace(records.into_boxed_slice(), cpu_count))
-}
-
-#[inline]
-fn read_u32(file: &mut File) -> Result<u32> {
-    let mut buf = [0u8; 4];
-    file.read_exact(&mut buf)?;
-    Ok(u32::from_ne_bytes(buf)) // host-endian because of XenTrace
-}
-
-#[inline]
-fn read_u64(file: &mut File) -> Result<u64> {
-    let mut buf = [0u8; 8];
-    file.read_exact(&mut buf)?;
-    Ok(u64::from_ne_bytes(buf)) // host-endian because of XenTrace
 }
 
 fn parse_event(file: &mut File, last_tsc: &mut u64) -> Result<Event> {
