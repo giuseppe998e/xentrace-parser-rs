@@ -77,6 +77,6 @@ impl Deref for Trace {
     type Target = [Record];
 
     fn deref(&self) -> &Self::Target {
-        &self.0
+        self.0.as_ref()
     }
 }
