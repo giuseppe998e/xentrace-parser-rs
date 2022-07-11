@@ -5,7 +5,7 @@ This is the Rust lang version of a [project](https://github.com/giuseppe998e/xen
 
 ## Dependencies
 
-- `cargo` (v1.56.0+)
+- `rust` (v1.56.1+)
 
 ## Usage
 
