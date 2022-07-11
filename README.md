@@ -1,6 +1,6 @@
 # XenTrace binary data parser (RUST LANG) [![GitHub Latest Tag](https://img.shields.io/github/v/tag/giuseppe998e/xentrace-parser-rs?style=flat-square)](https://github.com/giuseppe998e/xentrace-parser-rs/tags) [![Crates.io Downloads](https://img.shields.io/crates/d/xentrace-parser?style=flat-square)](https://crates.io/crates/xentrace-parser)
 
-This library parses XenTrace binary files by producing a list of events sorted by their TSC.
+This library parses XenTrace binary files by producing a list of events sorted by their TSC.  
 This is the Rust lang version of a [project](https://github.com/giuseppe998e/xentrace-parser) made for the final three-year degree exam at the University of Turin.
 
 ## Dependencies
