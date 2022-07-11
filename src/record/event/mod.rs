@@ -19,14 +19,17 @@ pub struct Event {
 }
 
 impl Event {
+    /// Returns the [code](ecode::EventCode) of the event.
     pub fn code(&self) -> EventCode {
         self.code
     }
 
+    /// Returns the timestamp of the event (the value of the CPU cycle counter).
     pub fn tsc(&self) -> u64 {
         self.tsc
     }
 
+    /// Returns the list of additional event information (maximum [`EVENT_EXTRA_MAXLEN`](super::EVENT_EXTRA_MAXLEN) items).
     pub fn extra(&self) -> &[Option<u32>; EVENT_EXTRA_MAXLEN] {
         &self.extra
     }

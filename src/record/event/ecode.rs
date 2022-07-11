@@ -13,14 +13,17 @@ pub struct EventCode {
 }
 
 impl EventCode {
+    /// Returns the event class, can be used to filter events.
     pub fn main(&self) -> u16 {
         self.main
     }
 
+    /// Returns the event subclass, can also be used to filter events.
     pub fn sub(&self) -> u8 {
         self.sub
     }
 
+    /// Returns the event minor, identifies the event in its class and subclass.
     pub fn minor(&self) -> u16 {
         self.minor
     }
