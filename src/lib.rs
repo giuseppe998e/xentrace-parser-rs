@@ -37,7 +37,7 @@ use util::fs::ReadNumber;
 /// ```
 pub fn xentrace_parse(file: &str) -> Result<Trace> {
     let mut records = Vec::<Record>::new();
-    let cpu_count: u16 = {
+    let cpu_count = {
         let path = Path::new(file);
         let mut file = File::open(path)?;
 
