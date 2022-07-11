@@ -3,6 +3,10 @@
 This library parses XenTrace binary files by producing a list of events sorted by their TSC.
 This is the Rust lang version of a [project](https://github.com/giuseppe998e/xentrace-parser) made for the final three-year degree exam at the University of Turin.
 
+## Dependencies
+
+- `cargo` (v1.55.0+)
+
 ## Usage
 
 ```rust
