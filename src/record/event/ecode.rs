@@ -5,11 +5,25 @@ use std::fmt::{Debug, Formatter, Result};
 pub struct EventCode {
     code: u32,
     /// Class, can be used to filter events.
-    pub main: u16,
+    pub(crate) main: u16,
     /// Subclass, can also be used to filter events.
-    pub sub: u8,
+    pub(crate) sub: u8,
     /// Minor, identifies the event in its class and subclass.
-    pub minor: u16,
+    pub(crate) minor: u16,
+}
+
+impl EventCode {
+    pub fn main(&self) -> u16 {
+        self.main
+    }
+
+    pub fn sub(&self) -> u8 {
+        self.sub
+    }
+
+    pub fn minor(&self) -> u16 {
+        self.minor
+    }
 }
 
 impl Debug for EventCode {

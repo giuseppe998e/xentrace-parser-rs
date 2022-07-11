@@ -1,7 +1,7 @@
+use std::cmp::Ordering;
+
 mod ecode;
 pub use ecode::EventCode;
-
-use std::cmp::Ordering;
 
 /// Maximum value of an event's list of additional information.
 pub const EVENT_EXTRA_MAXLEN: usize = 7;
@@ -11,11 +11,25 @@ pub const EVENT_EXTRA_MAXLEN: usize = 7;
 #[derive(Debug, Clone, Eq)]
 pub struct Event {
     /// The [code](ecode::EventCode) of the event.
-    pub code: EventCode,
+    pub(crate) code: EventCode,
     /// The timestamp of the event (the value of the CPU cycle counter).
-    pub tsc: u64,
+    pub(crate) tsc: u64,
     /// The list of additional event information (maximum [`EVENT_EXTRA_MAXLEN`](super::EVENT_EXTRA_MAXLEN) items).
-    pub extra: [Option<u32>; EVENT_EXTRA_MAXLEN],
+    pub(crate) extra: [Option<u32>; EVENT_EXTRA_MAXLEN],
+}
+
+impl Event {
+    pub fn code(&self) -> EventCode {
+        self.code
+    }
+
+    pub fn tsc(&self) -> u64 {
+        self.tsc
+    }
+
+    pub fn extra(&self) -> &[Option<u32>; EVENT_EXTRA_MAXLEN] {
+        &self.extra
+    }
 }
 
 impl PartialEq for Event {

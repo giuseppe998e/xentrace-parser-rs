@@ -1,33 +1,43 @@
 mod dtype;
-pub use dtype::DomainType;
+pub use dtype::DomainKind;
 
 /// Contains the domain information of the [`Record`](super::Record).
 #[derive(Clone, Copy, Debug, Default, Eq, Ord, PartialEq, PartialOrd)]
 pub struct Domain {
     /// The [type](dtype::DomainType) of virtual machine.
-    pub type_: DomainType,
+    pub(crate) kind: DomainKind,
     /// The virtual processor number.
-    pub vcpu: u16,
+    pub(crate) vcpu: u16,
+}
+
+impl Domain {
+    pub fn kind(&self) -> DomainKind {
+        self.kind
+    }
+
+    pub fn virt_cpu(&self) -> u16 {
+        self.vcpu
+    }
 }
 
 impl From<u32> for Domain {
     fn from(val: u32) -> Self {
         let vcpu = (val & 0x0000FFFF) as u16;
-        let type_ = {
+        let kind = {
             let id = (val >> 16) as u16;
-            DomainType::from(id)
+            DomainKind::from(id)
         };
 
-        Self { type_, vcpu }
+        Self { kind, vcpu }
     }
 }
 
 impl From<Domain> for u32 {
     fn from(val: Domain) -> Self {
-        let type_u32 = u32::from(val.type_);
+        let kind_u32 = u32::from(val.kind);
         let vcpu_u32 = val.vcpu as u32;
 
-        (type_u32 << 16) | vcpu_u32
+        (kind_u32 << 16) | vcpu_u32
     }
 }
 
@@ -81,7 +91,7 @@ mod tests {
         let dom2 = Domain::from(0x00015003);
 
         assert_eq!(dom1, dom2);
-        assert_eq!(dom1.type_, dom2.type_);
+        assert_eq!(dom1.kind, dom2.kind);
         assert_eq!(dom1.vcpu, dom2.vcpu);
     }
 
@@ -93,6 +103,6 @@ mod tests {
         assert_ne!(u32::from(dom1), dom2.into());
         assert_ne!(dom1.vcpu, dom2.vcpu);
 
-        assert_eq!(dom1.type_, dom2.type_);
+        assert_eq!(dom1.kind, dom2.kind);
     }
 }
