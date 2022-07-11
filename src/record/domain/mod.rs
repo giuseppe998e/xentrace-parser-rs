@@ -11,10 +11,12 @@ pub struct Domain {
 }
 
 impl Domain {
+    /// Returns the [type](dtype::DomainType) of virtual machine.
     pub fn kind(&self) -> DomainKind {
         self.kind
     }
 
+    /// Returns the virtual processor number.
     pub fn virt_cpu(&self) -> u16 {
         self.vcpu
     }
