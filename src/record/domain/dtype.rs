@@ -1,15 +1,20 @@
 /// Type of virtual machine.
-#[derive(Clone, Copy, Default, Debug, Eq, Ord, PartialEq, PartialOrd)]
+#[derive(Clone, Copy, Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub enum DomainKind {
     /// The zero/host domain (*The privileged VM*).
     Zero,
     /// The idle domain (*The CPU is not used*).
     Idle,
     /// The default domain (*No info available*).
-    #[default]
     Default,
     /// The unprivileged domain (*The running VMs*).
     Guest(u16),
+}
+
+impl Default for DomainKind {
+    fn default() -> Self {
+        Self::Default
+    }
 }
 
 impl From<u16> for DomainKind {
