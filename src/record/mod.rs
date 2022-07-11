@@ -1,20 +1,34 @@
+use std::{borrow::Borrow, cmp::Ordering, rc::Rc};
+
 mod domain;
-pub use domain::{Domain, DomainType};
+pub use domain::{Domain, DomainKind};
 
 mod event;
 pub use event::{Event, EventCode, EVENT_EXTRA_MAXLEN};
-
-use std::cmp::Ordering;
 
 /// Contains information from a single record of the parsed XenTrace binary file.
 #[derive(Clone, Eq, Debug)]
 pub struct Record {
     /// The processor number (of the host) on which the [`Event`](event::Event) occurred.
-    pub cpu: u16,
+    pub(crate) cpu: u16,
     /// The [`Domain`](domain::Domain) on which the [`Event`](event::Event) occurred.
-    pub domain: Domain,
+    pub(crate) domain: Rc<Domain>,
     /// The information of the [`Event`](event::Event) of this record.
-    pub event: Event,
+    pub(crate) event: Event,
+}
+
+impl Record {
+    pub fn cpu(&self) -> u16 {
+        self.cpu
+    }
+
+    pub fn domain(&self) -> &Domain {
+        self.domain.borrow()
+    }
+
+    pub fn event(&self) -> &Event {
+        &self.event
+    }
 }
 
 impl PartialEq for Record {
