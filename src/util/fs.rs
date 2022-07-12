@@ -1,6 +1,6 @@
 use std::{
     fs::File,
-    io::{Read, Result},
+    io::{BufReader, Read, Result},
 };
 
 pub(crate) trait ReadNumber {
@@ -8,7 +8,7 @@ pub(crate) trait ReadNumber {
     fn read_u64(&mut self) -> Result<u64>;
 }
 
-impl ReadNumber for File {
+impl ReadNumber for BufReader<File> {
     #[inline]
     fn read_u32(&mut self) -> Result<u32> {
         let mut buf = [0u8; 4];
