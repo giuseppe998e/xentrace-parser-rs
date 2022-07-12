@@ -1,7 +1,7 @@
 use std::{
     collections::HashMap,
     fs::File,
-    io::{Error, ErrorKind, Result},
+    io::{BufReader, Error, ErrorKind, Result},
     path::Path,
     rc::Rc,
 };
@@ -39,14 +39,14 @@ pub fn xentrace_parse(file: &str) -> Result<Trace> {
     let mut records = Vec::<Record>::new();
     let cpu_count = {
         let path = Path::new(file);
-        let mut file = File::open(path)?;
+        let mut buf = File::open(path).map(BufReader::new)?;
 
         let mut last_tsc = 0u64;
         let mut current_cpu = 0u16;
         let mut cpus_dom = HashMap::<u16, Rc<Domain>>::with_capacity(32);
 
         loop {
-            let record = parse_record(&mut file, &mut last_tsc, &mut current_cpu, &mut cpus_dom);
+            let record = parse_record(&mut buf, &mut last_tsc, &mut current_cpu, &mut cpus_dom);
             match record {
                 Ok(r) => records.push(r),
                 Err(e) => match e.kind() {
@@ -64,8 +64,8 @@ pub fn xentrace_parse(file: &str) -> Result<Trace> {
     Ok(Trace(records.into_boxed_slice(), cpu_count))
 }
 
-fn parse_event(file: &mut File, last_tsc: &mut u64) -> Result<Event> {
-    let hdr = file.read_u32()?;
+fn parse_event(buf: &mut BufReader<File>, last_tsc: &mut u64) -> Result<Event> {
+    let hdr = buf.read_u32()?;
 
     // Code
     let code = hdr & 0x0FFFFFFF;
@@ -75,7 +75,7 @@ fn parse_event(file: &mut File, last_tsc: &mut u64) -> Result<Event> {
     let tsc = {
         let in_tsc = (hdr & (1 << 31)) > 0;
         if in_tsc {
-            *last_tsc = file.read_u64()?;
+            *last_tsc = buf.read_u64()?;
         }
 
         *last_tsc
@@ -88,7 +88,7 @@ fn parse_event(file: &mut File, last_tsc: &mut u64) -> Result<Event> {
 
         if n_extra > 0 {
             for e in extra.iter_mut().take(n_extra) {
-                *e = file.read_u32().map(Some)?;
+                *e = buf.read_u32().map(Some)?;
             }
         }
 
@@ -99,12 +99,12 @@ fn parse_event(file: &mut File, last_tsc: &mut u64) -> Result<Event> {
 }
 
 fn parse_record(
-    file: &mut File,
+    buf: &mut BufReader<File>,
     last_tsc: &mut u64,
     current_cpu: &mut u16,
     cpus_dom: &mut HashMap<u16, Rc<Domain>>,
 ) -> Result<Record> {
-    let event = parse_event(file, last_tsc)?;
+    let event = parse_event(buf, last_tsc)?;
     let code = u32::from(event.code);
 
     if code == TRC_TRACE_CPU_CHANGE {

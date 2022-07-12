@@ -9,7 +9,7 @@ pub use event::{Event, EventCode, EVENT_EXTRA_MAXLEN};
 /// Contains information from a single record of the parsed XenTrace binary file.
 #[derive(Clone, Eq, Debug)]
 pub struct Record {
-    /// The processor number (of the host) on which the [`Event`](event::Event) occurred.
+    /// The processor id (of the host) on which the [`Event`](event::Event) occurred.
     pub(crate) cpu: u16,
     /// The [`Domain`](domain::Domain) on which the [`Event`](event::Event) occurred.
     pub(crate) domain: Rc<Domain>,
@@ -18,14 +18,17 @@ pub struct Record {
 }
 
 impl Record {
+    /// Returns the processor id (of the host) on which the [`Event`](event::Event) occurred.
     pub fn cpu(&self) -> u16 {
         self.cpu
     }
 
+    /// Returns the [`Domain`](domain::Domain) on which the [`Event`](event::Event) occurred.
     pub fn domain(&self) -> &Domain {
         self.domain.borrow()
     }
 
+    /// Returns the information of the [`Event`](event::Event) of this record.
     pub fn event(&self) -> &Event {
         &self.event
     }
