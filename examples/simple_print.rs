@@ -1,19 +1,24 @@
-use std::{env, io::Result};
-use xentrace_parser::{xentrace_parse, Trace};
+use std::{
+    env,
+    io::{Result, Write},
+};
+use xentrace_parser::Trace;
 
 fn main() -> Result<()> {
-    let trace_file = {
-        let current_dir = env::current_dir().unwrap();
-        format!("{}/{}", current_dir.to_str().unwrap(), "examples/trace.xen")
+    let trace = {
+        let mut path = env::current_dir().unwrap();
+        path.push("examples/trace.xen");
+        Trace::try_from(path.as_path())?
     };
 
-    let trace: Trace = xentrace_parse(&trace_file)?;
+    {
+        let mut stdout = std::io::stdout().lock();
+        for r in trace.iter() {
+            let _ = writeln!(&mut stdout, "{:?}", r);
+        }
 
-    for r in trace.iter() {
-        println!("{:?}", r);
+        let _ = writeln!(&mut stdout); // Blank
     }
-
-    println!(); // Blank
 
     let rec_count = trace.record_count();
     let cpu_count = trace.cpu_count();

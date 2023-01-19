@@ -14,7 +14,7 @@ pub struct Event {
     pub(crate) code: EventCode,
     /// The timestamp of the event (the value of the CPU cycle counter).
     pub(crate) tsc: u64,
-    /// The list of additional event information (maximum [`EVENT_EXTRA_MAXLEN`](super::EVENT_EXTRA_MAXLEN) items).
+    /// The list of additional event information (at most [`EVENT_EXTRA_MAXLEN`](super::EVENT_EXTRA_MAXLEN) items).
     pub(crate) extra: [Option<u32>; EVENT_EXTRA_MAXLEN],
 }
 
