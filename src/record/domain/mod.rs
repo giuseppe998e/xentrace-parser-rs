@@ -49,6 +49,12 @@ impl PartialEq<u32> for Domain {
     }
 }
 
+impl PartialEq<Domain> for u32 {
+    fn eq(&self, other: &Domain) -> bool {
+        u32::from(*other).eq(self)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::Domain;

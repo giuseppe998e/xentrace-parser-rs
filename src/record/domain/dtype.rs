@@ -39,6 +39,12 @@ impl PartialEq<u16> for DomainKind {
     }
 }
 
+impl PartialEq<DomainKind> for u16 {
+    fn eq(&self, other: &DomainKind) -> bool {
+        u16::from(*other).eq(self)
+    }
+}
+
 impl Default for DomainKind {
     fn default() -> Self {
         Self::Default

@@ -102,7 +102,7 @@ mod tests {
         };
         let last_event = &events[2];
 
-        assert_eq!(0x00015003u32, last_event.code.into());
+        assert_eq!(0x00015003u32, last_event.code);
         assert_eq!(u32::from(first_event.code), 0x00015001);
     }
 }
