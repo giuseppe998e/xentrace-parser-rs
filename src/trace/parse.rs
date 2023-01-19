@@ -23,7 +23,7 @@ struct ParseData {
 pub(super) fn parse_trace(mut reader: BufReader<File>) -> super::Trace {
     let mut parse_data = ParseData {
         records: Vec::with_capacity(u16::MAX as usize),
-        domains: HashMap::with_capacity(32),
+        domains: HashMap::with_capacity(u16::BITS as usize),
         last_tsc: 0,
         current_cpu: 0,
     };
