@@ -71,14 +71,12 @@ impl BitAnd<EventCode> for u32 {
 
 impl Debug for EventCode {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
-        write!(
-            f,
-            "EventCode {{ code: {:#010X}, main: {:#06X}, sub: {:#03X}, minor: {:#05X} }}",
-            self.0,
-            self.main(),
-            self.sub(),
-            self.minor()
-        )
+        f.debug_struct("EventCode")
+            .field("value", &format_args!("{:#010X}", self.0))
+            .field("main", &format_args!("{:#06X}", self.main()))
+            .field("sub", &format_args!("{:#03X}", self.sub()))
+            .field("minor", &format_args!("{:#05X}", self.minor()))
+            .finish()
     }
 }
 
