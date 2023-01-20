@@ -1,4 +1,7 @@
-use std::{fmt::{Debug, Formatter, Result}, ops::BitAnd};
+use std::{
+    fmt::{Debug, Formatter, Result},
+    ops::BitAnd,
+};
 
 /// Contains the event code read as a 32-bit unsigned big-endian integer.
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -44,7 +47,7 @@ impl PartialEq<u32> for EventCode {
     }
 }
 
-impl PartialEq<EventCode> for u32  {
+impl PartialEq<EventCode> for u32 {
     fn eq(&self, other: &EventCode) -> bool {
         u32::from(*other).eq(self)
     }
