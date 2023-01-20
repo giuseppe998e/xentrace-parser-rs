@@ -16,7 +16,7 @@ const TRC_SCHED_TO_RUN: u32 = 0x00021F0F;
 struct ParseData {
     records: Vec<Record>,
     domains: HashMap<u16, Rc<Domain>>,
-    last_tsc: u64,
+    current_tsc: u64,
     current_cpu: u16,
 }
 
@@ -24,7 +24,7 @@ pub(super) fn parse_trace(mut reader: BufReader<File>) -> super::Trace {
     let mut parse_data = ParseData {
         records: Vec::with_capacity(u16::MAX as usize),
         domains: HashMap::with_capacity(u16::BITS as usize),
-        last_tsc: 0,
+        current_tsc: 0,
         current_cpu: 0,
     };
 
@@ -47,7 +47,7 @@ pub(super) fn parse_trace(mut reader: BufReader<File>) -> super::Trace {
 }
 
 fn parse_record(buf: &mut BufReader<File>, parse_data: &mut ParseData) -> Option<Record> {
-    let event = parse_event(buf, parse_data).ok()?;
+    let event = read_event(buf, &mut parse_data.current_tsc).ok()?;
 
     let domain = match event.code == (event.code & TRC_SCHED_TO_RUN) {
         true => {
@@ -72,23 +72,23 @@ fn parse_record(buf: &mut BufReader<File>, parse_data: &mut ParseData) -> Option
     })
 }
 
-fn parse_event(buf: &mut BufReader<File>, parse_data: &mut ParseData) -> Result<Event> {
+fn read_event(buf: &mut BufReader<File>, current_tsc: &mut u64) -> Result<Event> {
     let header = buf.read_ne_u32()?;
 
-    // EventCode
+    // Code
     let code = {
         let code = header & 0x0FFFFFFF;
         EventCode::from(code)
     };
 
-    // Timestamp (CPU cycle counter)
+    // Timestamp
     let tsc = {
-        let include_tsc = (header & (1 << 31)) > 0;
-        if include_tsc {
-            parse_data.last_tsc = buf.read_ne_u64()?;
+        let has_tsc = (header & (1 << 31)) > 0;
+        if has_tsc {
+            *current_tsc = buf.read_ne_u64()?;
         }
 
-        parse_data.last_tsc
+        *current_tsc
     };
 
     // Extra list
