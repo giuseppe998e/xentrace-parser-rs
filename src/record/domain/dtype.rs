@@ -1,5 +1,5 @@
 /// Type of virtual machine.
-#[derive(Clone, Copy, Debug, Eq, Ord, PartialEq, PartialOrd)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum DomainKind {
     /// The zero/host domain (*The privileged VM*).
     Zero,
@@ -11,26 +11,20 @@ pub enum DomainKind {
     Guest(u16),
 }
 
-impl Default for DomainKind {
-    fn default() -> Self {
-        Self::Default
-    }
-}
-
 impl From<u16> for DomainKind {
-    fn from(val: u16) -> Self {
-        match val {
+    fn from(value: u16) -> Self {
+        match value {
             0 => Self::Zero,
             32767 => Self::Idle,
             32768 => Self::Default,
-            _ => Self::Guest(val),
+            _ => Self::Guest(value),
         }
     }
 }
 
 impl From<DomainKind> for u16 {
-    fn from(val: DomainKind) -> Self {
-        match val {
+    fn from(value: DomainKind) -> Self {
+        match value {
             DomainKind::Zero => 0,
             DomainKind::Idle => 32767,
             DomainKind::Default => 32768,
@@ -39,53 +33,21 @@ impl From<DomainKind> for u16 {
     }
 }
 
-impl From<DomainKind> for u32 {
-    fn from(val: DomainKind) -> Self {
-        u32::from(u16::from(val))
+impl PartialEq<u16> for DomainKind {
+    fn eq(&self, other: &u16) -> bool {
+        u16::from(*self).eq(other)
     }
 }
 
-impl From<DomainKind> for i32 {
-    fn from(val: DomainKind) -> Self {
-        i32::from(u16::from(val))
+impl PartialEq<DomainKind> for u16 {
+    fn eq(&self, other: &DomainKind) -> bool {
+        u16::from(*other).eq(self)
     }
 }
 
-impl From<DomainKind> for u64 {
-    fn from(val: DomainKind) -> Self {
-        u64::from(u16::from(val))
-    }
-}
-
-impl From<DomainKind> for i64 {
-    fn from(val: DomainKind) -> Self {
-        i64::from(u16::from(val))
-    }
-}
-
-impl From<DomainKind> for u128 {
-    fn from(val: DomainKind) -> Self {
-        u128::from(u16::from(val))
-    }
-}
-
-impl From<DomainKind> for i128 {
-    fn from(val: DomainKind) -> Self {
-        i128::from(u16::from(val))
-    }
-}
-
-impl From<DomainKind> for usize {
-    fn from(val: DomainKind) -> Self {
-        usize::from(u16::from(val))
-    }
-}
-
-impl TryFrom<DomainKind> for isize {
-    type Error = std::num::TryFromIntError;
-
-    fn try_from(value: DomainKind) -> Result<Self, Self::Error> {
-        isize::try_from(u16::from(value))
+impl Default for DomainKind {
+    fn default() -> Self {
+        Self::Default
     }
 }
 
@@ -106,13 +68,5 @@ mod tests {
         let type2 = DomainKind::from(55);
 
         assert_eq!(type1, type2);
-    }
-
-    #[test]
-    fn not_equality_test() {
-        let type1 = DomainKind::from(0);
-        let type2 = DomainKind::default();
-
-        assert_ne!(u128::from(type1), type2.into());
     }
 }

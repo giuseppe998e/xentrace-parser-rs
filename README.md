@@ -12,11 +12,21 @@ This is the Rust lang version of a [project](https://github.com/giuseppe998e/xen
 ```rust
 use xentrace_parser::{
     record::{Domain, DomainKind, Event, Record/*, EventCode*/},
-    xentrace_parse, Trace,
+    Trace,
 };
 
 fn main() -> Result<()> {
-    let trace: Trace = xentrace_parse("/path/to/trace.xen.dat")?;
+    let trace = Trace::try_from("/path/to/trace.xen.dat")?;
+
+    // let path: Path = todo!();
+    // let trace = Trace::try_from(path)?;
+
+    // let file: File = todo!();
+    // let trace = Trace::from(file);
+
+    // let file: File = todo!();
+    // let bufreader: BufReader<File> = BufReader::new(file);
+    // let trace = Trace::from(bufreader);
 
     for record in trace.iter() {
         let _cpu: u16 = record.cpu(); // Host CPU

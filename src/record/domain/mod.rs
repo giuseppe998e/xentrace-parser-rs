@@ -2,84 +2,56 @@ mod dtype;
 pub use dtype::DomainKind;
 
 /// Contains the domain information of the [`Record`](super::Record).
-#[derive(Clone, Copy, Debug, Default, Eq, Ord, PartialEq, PartialOrd)]
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
 pub struct Domain {
-    /// The [type](dtype::DomainType) of virtual machine.
-    pub(crate) kind: DomainKind,
     /// The virtual processor number.
     pub(crate) vcpu: u16,
+    /// The [type](dtype::DomainType) of virtual machine.
+    pub(crate) kind: DomainKind,
 }
 
 impl Domain {
+    /// Returns the virtual processor number.
+    pub fn virtual_cpu(&self) -> u16 {
+        self.vcpu
+    }
+
     /// Returns the [type](dtype::DomainType) of virtual machine.
     pub fn kind(&self) -> DomainKind {
         self.kind
     }
-
-    /// Returns the virtual processor number.
-    pub fn virt_cpu(&self) -> u16 {
-        self.vcpu
-    }
 }
 
 impl From<u32> for Domain {
-    fn from(val: u32) -> Self {
-        let vcpu = (val & 0x0000FFFF) as u16;
+    fn from(value: u32) -> Self {
+        let vcpu = (value & 0x0000FFFF) as u16;
         let kind = {
-            let id = (val >> 16) as u16;
+            let id = (value >> 16) as u16;
             DomainKind::from(id)
         };
 
-        Self { kind, vcpu }
+        Self { vcpu, kind }
     }
 }
 
 impl From<Domain> for u32 {
-    fn from(val: Domain) -> Self {
-        let kind_u32 = u32::from(val.kind);
-        let vcpu_u32 = val.vcpu as u32;
+    fn from(value: Domain) -> Self {
+        let vcpu = u32::from(value.vcpu);
+        let kind = u32::from(u16::from(value.kind));
 
-        (kind_u32 << 16) | vcpu_u32
+        (kind << 16) | vcpu
     }
 }
 
-impl From<Domain> for u64 {
-    fn from(val: Domain) -> Self {
-        u64::from(u32::from(val))
+impl PartialEq<u32> for Domain {
+    fn eq(&self, other: &u32) -> bool {
+        u32::from(*self).eq(other)
     }
 }
 
-impl From<Domain> for i64 {
-    fn from(val: Domain) -> Self {
-        i64::from(u32::from(val))
-    }
-}
-
-impl From<Domain> for u128 {
-    fn from(val: Domain) -> Self {
-        u128::from(u32::from(val))
-    }
-}
-
-impl From<Domain> for i128 {
-    fn from(val: Domain) -> Self {
-        i128::from(u32::from(val))
-    }
-}
-
-impl TryFrom<Domain> for usize {
-    type Error = std::num::TryFromIntError;
-
-    fn try_from(value: Domain) -> std::result::Result<Self, Self::Error> {
-        usize::try_from(u32::from(value))
-    }
-}
-
-impl TryFrom<Domain> for isize {
-    type Error = std::num::TryFromIntError;
-
-    fn try_from(value: Domain) -> std::result::Result<Self, Self::Error> {
-        isize::try_from(u32::from(value))
+impl PartialEq<Domain> for u32 {
+    fn eq(&self, other: &Domain) -> bool {
+        u32::from(*other).eq(self)
     }
 }
 
@@ -88,7 +60,7 @@ mod tests {
     use super::Domain;
 
     #[test]
-    fn equality_test() {
+    fn full_equality_test() {
         let dom1 = Domain::from(0x00015003);
         let dom2 = Domain::from(0x00015003);
 
@@ -98,11 +70,11 @@ mod tests {
     }
 
     #[test]
-    fn not_equality_test() {
+    fn equality_test() {
         let dom1 = Domain::from(0x00015003);
         let dom2 = Domain::from(0x00015103);
 
-        assert_ne!(u32::from(dom1), dom2.into());
+        assert_ne!(dom1, dom2);
         assert_ne!(dom1.vcpu, dom2.vcpu);
 
         assert_eq!(dom1.kind, dom2.kind);

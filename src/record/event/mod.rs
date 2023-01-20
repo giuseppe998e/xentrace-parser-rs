@@ -14,7 +14,7 @@ pub struct Event {
     pub(crate) code: EventCode,
     /// The timestamp of the event (the value of the CPU cycle counter).
     pub(crate) tsc: u64,
-    /// The list of additional event information (maximum [`EVENT_EXTRA_MAXLEN`](super::EVENT_EXTRA_MAXLEN) items).
+    /// The list of additional event information (at most [`EVENT_EXTRA_MAXLEN`](super::EVENT_EXTRA_MAXLEN) items).
     pub(crate) extra: [Option<u32>; EVENT_EXTRA_MAXLEN],
 }
 
@@ -74,7 +74,7 @@ mod tests {
     }
 
     #[test]
-    fn ordinariness_test() {
+    fn sorting_test() {
         let mut events = vec![
             Event {
                 code: EventCode::from(0x00015004),
@@ -102,7 +102,7 @@ mod tests {
         };
         let last_event = &events[2];
 
-        assert_eq!(0x00015003u32, last_event.code.into());
+        assert_eq!(0x00015003u32, last_event.code);
         assert_eq!(u32::from(first_event.code), 0x00015001);
     }
 }
