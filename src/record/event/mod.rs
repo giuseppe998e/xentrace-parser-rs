@@ -74,7 +74,7 @@ mod tests {
     }
 
     #[test]
-    fn ordinariness_test() {
+    fn sorting_test() {
         let mut events = vec![
             Event {
                 code: EventCode::from(0x00015004),
