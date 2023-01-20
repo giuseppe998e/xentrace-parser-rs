@@ -6,6 +6,7 @@ mod parse;
 use parse::parse_trace;
 
 /// Contains the [Record](crate::record::Record) list of the parsed XenTrace binary file.
+/// The trace is truncated to the last readable record, returning no errors.
 ///
 /// # Example
 ///
