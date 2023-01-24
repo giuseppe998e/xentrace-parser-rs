@@ -24,11 +24,17 @@ impl From<u16> for DomainKind {
 
 impl From<DomainKind> for u16 {
     fn from(value: DomainKind) -> Self {
+        u16::from(&value)
+    }
+}
+
+impl From<&DomainKind> for u16 {
+    fn from(value: &DomainKind) -> Self {
         match value {
             DomainKind::Zero => 0,
             DomainKind::Idle => 32767,
             DomainKind::Default => 32768,
-            DomainKind::Guest(v) => v,
+            DomainKind::Guest(v) => *v,
         }
     }
 }
