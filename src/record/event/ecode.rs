@@ -41,6 +41,12 @@ impl From<EventCode> for u32 {
     }
 }
 
+impl From<&EventCode> for u32 {
+    fn from(value: &EventCode) -> Self {
+        value.0
+    }
+}
+
 impl PartialEq<u32> for EventCode {
     fn eq(&self, other: &u32) -> bool {
         u32::from(*self).eq(other)

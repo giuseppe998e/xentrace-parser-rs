@@ -36,6 +36,12 @@ impl From<u32> for Domain {
 
 impl From<Domain> for u32 {
     fn from(value: Domain) -> Self {
+        u32::from(&value)
+    }
+}
+
+impl From<&Domain> for u32 {
+    fn from(value: &Domain) -> Self {
         let vcpu = u32::from(value.vcpu);
         let kind = u32::from(u16::from(value.kind));
 
