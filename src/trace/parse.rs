@@ -7,7 +7,7 @@ use std::{
 
 use crate::{
     record::{Domain, Event, EventCode, Record, EVENT_EXTRA_MAXLEN},
-    util::bufreader::ReadNumber,
+    util::read_number::ReadNumber,
 };
 
 const TRC_TRACE_CPU_CHANGE: u32 = 0x0001F003;
