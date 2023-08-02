@@ -140,6 +140,12 @@ impl Deref for Trace {
     type Target = [Record];
 
     fn deref(&self) -> &Self::Target {
+        self.0.deref()
+    }
+}
+
+impl AsRef<[Record]> for Trace {
+    fn as_ref(&self) -> &[Record] {
         self.0.as_ref()
     }
 }
