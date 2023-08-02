@@ -2,7 +2,6 @@ use std::{
     collections::HashMap,
     fs::File,
     io::{BufReader, Result},
-    rc::Rc,
 };
 
 use crate::{
@@ -15,7 +14,7 @@ const TRC_SCHED_TO_RUN: u32 = 0x00021F0F;
 
 struct ParseData {
     records: Vec<Record>,
-    domains: HashMap<u16, Rc<Domain>>,
+    domains: HashMap<u16, Domain>,
     current_tsc: u64,
     current_cpu: u16,
 }
@@ -52,16 +51,16 @@ fn parse_record(buf: &mut BufReader<File>, parse_data: &mut ParseData) -> Option
     let domain = match event.code == (event.code & TRC_SCHED_TO_RUN) {
         true => {
             let extra_0 = event.extra[0].unwrap_or(0);
-            let domain = Rc::new(Domain::from(extra_0));
+            let domain = Domain::from(extra_0);
             parse_data
                 .domains
-                .insert(parse_data.current_cpu, Rc::clone(&domain));
+                .insert(parse_data.current_cpu, domain);
             domain
         }
         false => parse_data
             .domains
             .get(&parse_data.current_cpu)
-            .map(Rc::clone)
+            .copied()
             .unwrap_or_default(),
     };
 
