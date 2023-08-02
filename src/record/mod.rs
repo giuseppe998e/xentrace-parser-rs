@@ -1,4 +1,4 @@
-use std::{borrow::Borrow, cmp::Ordering, rc::Rc};
+use std::cmp::Ordering;
 
 mod domain;
 pub use domain::{Domain, DomainKind};
@@ -12,7 +12,7 @@ pub struct Record {
     /// The processor id (of the host) on which the [`Event`](event::Event) occurred.
     pub(crate) cpu: u16,
     /// The [`Domain`](domain::Domain) on which the [`Event`](event::Event) occurred.
-    pub(crate) domain: Rc<Domain>,
+    pub(crate) domain: Domain,
     /// The information of the [`Event`](event::Event) of this record.
     pub(crate) event: Event,
 }
@@ -25,7 +25,7 @@ impl Record {
 
     /// Returns the [`Domain`](domain::Domain) on which the [`Event`](event::Event) occurred.
     pub fn domain(&self) -> &Domain {
-        self.domain.borrow()
+        &self.domain
     }
 
     /// Returns the information of the [`Event`](event::Event) of this record.

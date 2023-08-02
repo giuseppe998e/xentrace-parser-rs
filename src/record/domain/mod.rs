@@ -1,5 +1,5 @@
-mod dtype;
-pub use dtype::DomainKind;
+mod dkind;
+pub use dkind::DomainKind;
 
 /// Contains the domain information of the [`Record`](super::Record).
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
