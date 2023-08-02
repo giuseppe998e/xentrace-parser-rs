@@ -4,6 +4,7 @@ use std::{
 };
 
 /// Contains the event code read as a 32-bit unsigned big-endian integer.
+#[repr(transparent)]
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub struct EventCode(u32);
 
