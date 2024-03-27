@@ -34,7 +34,7 @@ fn main() -> Result<()> {
 }
 ```
 
-> An example debug can be started from the root directory with: `cargo run --example debug_trace`
+> An example debug can be started from the root directory with: `cargo run --example debug_trace` (only available on GitHub sources).
 
 ## License
 
