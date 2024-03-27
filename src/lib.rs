@@ -1,6 +1,11 @@
+#![deny(unsafe_code)]
+
+mod error;
+pub mod record;
+mod trace;
 mod util;
 
-pub mod record;
-
-mod trace;
-pub use trace::Trace;
+pub use self::{
+    error::{Error, Result},
+    trace::Trace,
+};

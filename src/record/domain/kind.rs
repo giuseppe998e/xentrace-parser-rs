@@ -1,5 +1,5 @@
 /// Type of virtual machine.
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum DomainKind {
     /// The zero/host domain (*The privileged VM*).
     Zero,

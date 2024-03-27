@@ -1,8 +1,9 @@
-mod dkind;
-pub use dkind::DomainKind;
+mod kind;
+
+pub use self::kind::DomainKind;
 
 /// Contains the domain information of the [`Record`](super::Record).
-#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct Domain {
     /// The virtual processor number.
     pub(crate) vcpu: u16,
@@ -43,7 +44,7 @@ impl From<Domain> for u32 {
 impl From<&Domain> for u32 {
     fn from(value: &Domain) -> Self {
         let vcpu = u32::from(value.vcpu);
-        let kind = u32::from(u16::from(value.kind));
+        let kind = u16::from(value.kind) as u32;
 
         (kind << 16) | vcpu
     }

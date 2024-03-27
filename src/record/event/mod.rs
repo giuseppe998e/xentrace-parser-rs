@@ -1,21 +1,22 @@
+mod code;
+
 use std::cmp::Ordering;
 
-mod ecode;
-pub use ecode::EventCode;
+pub use self::code::EventCode;
 
 /// Maximum value of an event's list of additional information.
-pub const EVENT_EXTRA_MAXLEN: usize = 7;
+pub const EVENT_EXTRA_CAPACITY: usize = 7;
 
 /// Contains the information of a single event.
 /// It is a sub-structure of [`Record`](super::Record).
-#[derive(Debug, Clone, Eq)]
+#[derive(Clone, Debug, Eq)]
 pub struct Event {
     /// The [code](ecode::EventCode) of the event.
     pub(crate) code: EventCode,
     /// The timestamp of the event (the value of the CPU cycle counter).
     pub(crate) tsc: u64,
     /// The list of additional event information (at most [`EVENT_EXTRA_MAXLEN`](super::EVENT_EXTRA_MAXLEN) items).
-    pub(crate) extra: [Option<u32>; EVENT_EXTRA_MAXLEN],
+    pub(crate) extra: [Option<u32>; EVENT_EXTRA_CAPACITY],
 }
 
 impl Event {
@@ -30,7 +31,7 @@ impl Event {
     }
 
     /// Returns the list of additional event information (maximum [`EVENT_EXTRA_MAXLEN`](super::EVENT_EXTRA_MAXLEN) items).
-    pub fn extra(&self) -> &[Option<u32>; EVENT_EXTRA_MAXLEN] {
+    pub fn extra(&self) -> &[Option<u32>; EVENT_EXTRA_CAPACITY] {
         &self.extra
     }
 }
@@ -55,19 +56,19 @@ impl PartialOrd for Event {
 
 #[cfg(test)]
 mod tests {
-    use super::{Event, EventCode, EVENT_EXTRA_MAXLEN};
+    use super::{Event, EventCode, EVENT_EXTRA_CAPACITY};
 
     #[test]
     fn equality_test() {
         let event1 = Event {
             code: EventCode::from(0x00015003),
             tsc: 0,
-            extra: [None; EVENT_EXTRA_MAXLEN],
+            extra: [None; EVENT_EXTRA_CAPACITY],
         };
         let event2 = Event {
             code: EventCode::from(0x00015003),
             tsc: 0,
-            extra: [None; EVENT_EXTRA_MAXLEN],
+            extra: [None; EVENT_EXTRA_CAPACITY],
         };
 
         assert_eq!(event1, event2);
@@ -79,17 +80,17 @@ mod tests {
             Event {
                 code: EventCode::from(0x00015004),
                 tsc: 4,
-                extra: [None; EVENT_EXTRA_MAXLEN],
+                extra: [None; EVENT_EXTRA_CAPACITY],
             },
             Event {
                 code: EventCode::from(0x00015001),
                 tsc: 0,
-                extra: [None; EVENT_EXTRA_MAXLEN],
+                extra: [None; EVENT_EXTRA_CAPACITY],
             },
             Event {
                 code: EventCode::from(0x00015003),
                 tsc: 98,
-                extra: [None; EVENT_EXTRA_MAXLEN],
+                extra: [None; EVENT_EXTRA_CAPACITY],
             },
         ];
 
@@ -98,7 +99,7 @@ mod tests {
         let first_event = Event {
             code: EventCode::from(0x00015001),
             tsc: 0,
-            extra: [None; EVENT_EXTRA_MAXLEN],
+            extra: [None; EVENT_EXTRA_CAPACITY],
         };
         let last_event = &events[2];
 

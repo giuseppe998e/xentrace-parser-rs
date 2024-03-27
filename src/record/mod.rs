@@ -1,16 +1,18 @@
+mod domain;
+mod event;
+
 use std::cmp::Ordering;
 
-mod domain;
-pub use domain::{Domain, DomainKind};
-
-mod event;
-pub use event::{Event, EventCode, EVENT_EXTRA_MAXLEN};
+pub use self::{
+    domain::{Domain, DomainKind},
+    event::{Event, EventCode, EVENT_EXTRA_CAPACITY},
+};
 
 /// Contains information from a single record of the parsed XenTrace binary file.
-#[derive(Clone, Eq, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Record {
     /// The processor id (of the host) on which the [`Event`](event::Event) occurred.
-    pub(crate) cpu: u16,
+    pub(crate) cpu: u32,
     /// The [`Domain`](domain::Domain) on which the [`Event`](event::Event) occurred.
     pub(crate) domain: Domain,
     /// The information of the [`Event`](event::Event) of this record.
@@ -19,7 +21,7 @@ pub struct Record {
 
 impl Record {
     /// Returns the processor id (of the host) on which the [`Event`](event::Event) occurred.
-    pub fn cpu(&self) -> u16 {
+    pub fn cpu(&self) -> u32 {
         self.cpu
     }
 
@@ -31,12 +33,6 @@ impl Record {
     /// Returns the information of the [`Event`](event::Event) of this record.
     pub fn event(&self) -> &Event {
         &self.event
-    }
-}
-
-impl PartialEq for Record {
-    fn eq(&self, other: &Self) -> bool {
-        self.cpu == other.cpu && self.domain == other.domain && self.event == other.event
     }
 }
 
