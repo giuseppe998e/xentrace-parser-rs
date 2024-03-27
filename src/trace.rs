@@ -160,6 +160,8 @@ impl Deref for Trace {
 mod parse {
     use std::collections::HashMap;
 
+    use fxhash::FxBuildHasher;
+
     use super::*;
     use crate::{
         record::{Domain, Event, EventCode, EVENT_EXTRA_CAPACITY},
@@ -170,7 +172,7 @@ mod parse {
     const TRC_SCHED_TO_RUN: u32 = 0x00021F0F;
 
     struct ParserData {
-        domains: HashMap<u32, Domain>,
+        domains: HashMap<u32, Domain, FxBuildHasher>,
         last_cpu: u32,
         records: Vec<Record>,
         last_tsc: u64,
@@ -178,7 +180,7 @@ mod parse {
 
     pub(super) fn parse_trace<R: io::Read>(mut rdr: R) -> Result<Trace> {
         let mut data = ParserData {
-            domains: HashMap::with_capacity(u16::BITS as usize),
+            domains: HashMap::with_capacity_and_hasher(u16::BITS as usize, FxBuildHasher::default()),
             last_cpu: 0,
             records: Vec::with_capacity((u16::MAX / 2) as usize),
             last_tsc: 0,

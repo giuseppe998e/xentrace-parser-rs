@@ -1,6 +1,6 @@
 [package]
 name = "xentrace-parser"
-version = "2.0.1"
+version = "2.0.2"
 description = "A XenTrace files parser with a study purpose"
 authors = ["Giuseppe Eletto <giuseppe.eletto98@gmail.com>"]
 license = "LGPL-2.1-or-later"
@@ -9,3 +9,6 @@ repository = "https://github.com/giuseppe998e/xentrace-parser-rs"
 keywords = ["xen", "xentrace", "trace", "parser", "analyzer"]
 exclude = ["/examples"]
 edition = "2021"
+
+[dependencies]
+fxhash = "0.2"
