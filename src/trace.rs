@@ -55,7 +55,7 @@ impl Trace {
     /// ```
     pub fn from_file<P: AsRef<Path>>(path: P) -> Result<Self> {
         fs::File::open(path)
-            .map_err(|e| Error::new_source("Failed to open trace file", e))
+            .map_err(|e| Error::io_error("Failed to open trace file", e))
             .map(io::BufReader::new)
             .and_then(parse_trace)
     }
@@ -180,7 +180,10 @@ mod parse {
 
     pub(super) fn parse_trace<R: io::Read>(mut rdr: R) -> Result<Trace> {
         let mut data = ParserData {
-            domains: HashMap::with_capacity_and_hasher(u16::BITS as usize, FxBuildHasher::default()),
+            domains: HashMap::with_capacity_and_hasher(
+                u16::BITS as usize,
+                FxBuildHasher::default(),
+            ),
             last_cpu: 0,
             records: Vec::with_capacity((u16::MAX / 2) as usize),
             last_tsc: 0,
@@ -223,7 +226,7 @@ mod parse {
                 if header & (1 << 31) > 0 {
                     *last_tsc = rdr
                         .read_ne_u64()
-                        .map_err(|e| Error::new_source("Failed to read tsc value", e))?;
+                        .map_err(|e| Error::io_error("Failed to read tsc value", e))?;
                 }
 
                 *last_tsc
@@ -237,7 +240,7 @@ mod parse {
                     *entry = rdr
                         .read_ne_u32()
                         .map(Some)
-                        .map_err(|e| Error::new_source("Failed to read extra value", e))?;
+                        .map_err(|e| Error::io_error("Failed to read extra value", e))?;
                 }
 
                 extra

@@ -1,6 +1,6 @@
 [package]
 name = "xentrace-parser"
-version = "2.0.2"
+version = "2.1.0"
 description = "A XenTrace files parser with a study purpose"
 authors = ["Giuseppe Eletto <giuseppe.eletto98@gmail.com>"]
 license = "LGPL-2.1-or-later"

@@ -1,6 +1,6 @@
 #![deny(unsafe_code)]
 
-mod error;
+pub mod error;
 pub mod record;
 mod trace;
 mod util;
